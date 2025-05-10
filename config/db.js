@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 dotenv.config();
 const connectDB = async () => {
-    
+    // mongodb+srv://tndeyeamie456:RAYMoVXYpXbEeRYo@cluster0.vvwurlt.mongodb.net/
   try {
     await mongoose.connect(process.env.MONGO_URL);
     console.log("✅ Connexion à MongoDB réussie");
