@@ -14,13 +14,16 @@ app.use(express.json());
 app.use(cors());
 
 
-mongoose.connect(process.env.MONG_URL)
+
+mongoose.connect(process.env.MONG_URL)  
 .then(() => {
     app.listen(process.env.PORT, () => {
       console.log(`Server running on port 8080`);
     });
   });
-  app.get("/", (req, res) => {
+
+
+app.get("/", (req, res) => {
     res.send("Hello World!");
   })
 
