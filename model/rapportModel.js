@@ -13,6 +13,10 @@ const rapportSchema = new mongoose.Schema({
    fileUrl: {
     type: String,
     required: true,
+   },
+   category : {
+    type: String,
+    required: true,
    }
     // userId: {
     //     type: mongoose.Schema.Types.ObjectId,
