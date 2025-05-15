@@ -17,6 +17,9 @@ const rapportSchema = new mongoose.Schema({
    category : {
     type: String,
     required: true,
+   },
+   tags: {
+    type: String,
    }
     // userId: {
     //     type: mongoose.Schema.Types.ObjectId,

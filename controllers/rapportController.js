@@ -3,18 +3,23 @@ const mongoose = require("mongoose")
 
 
 const createRapport = async (req, res) => {
-    const {title, description, category} = req.body
+    const {title, description, category, tags} = req.body
+    const file = req.file
 
-    if(!title || !description || !req.file  || !category){
+    if(!title || !description || !file || !category){
         return res.status(400).json({message: "Veuillez renseigner ces champs"})
     }
+    
 
     try {
+        const fileUrl = file.path
+
         const newRapport = new Rapport({
         title,
         description,
-        fileUrl: req.file.path,
-        category
+        fileUrl,
+        category,
+        tags
     })
 
     await newRapport.save()
