@@ -6,6 +6,7 @@ const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads/"); // ici la destination s'appelle uploads
   },
+  
   filename: function (req, file, cb) {
     const uniqueName = Date.now() + "-" + file.originalname; // ici on le nom du fichier en la rendant unique pour eviter les doublons
     cb(null, uniqueName);
