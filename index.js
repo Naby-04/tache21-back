@@ -2,7 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const connectDB = require("./config/db.js");
-const {errorHandler} = require("./middleware/errorMiddleware.js")
+const {errorHandler} = require("./middlewares/errorMiddleware.js")
 const usersRoutes = require("./routes/usersRoutes.js")
 const rapportRoutes = require("./routes/Rapport");
 
