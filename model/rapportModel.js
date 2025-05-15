@@ -10,16 +10,22 @@ const rapportSchema = new mongoose.Schema({
     type: String,
     required: true,
    },
-
    fileUrl: {
     type: String,
     required: true,
    },
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-    },
+   category : {
+    type: String,
+    required: true,
+   },
+   tags: {
+    type: String,
+   }
+    // userId: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "User",
+    //     required: true,
+    // },
 }, {timestamps: true});
 
 module.exports = mongoose.model("Rapport", rapportSchema);
