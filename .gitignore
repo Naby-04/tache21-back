@@ -2,3 +2,6 @@
 node_modules/
 # Ignorer les fichiers d’environnement
 .env
+
+
+# on va creer d'abord les fonction createRapport, getRapport, deleteRapport et updateRapport
