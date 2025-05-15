@@ -4,7 +4,7 @@ const mongoose = require("mongoose")
 
 const createRapport = async (req, res) => {
     const {title, description, category, tags} = req.body
-    const file = req.file
+    const file = req.file //on recupere le nom depuis le middleware update
 
     if(!title || !description || !file || !category){
         return res.status(400).json({message: "Veuillez renseigner ces champs"})
@@ -12,7 +12,7 @@ const createRapport = async (req, res) => {
     
 
     try {
-        const fileUrl = file.path
+        const fileUrl = file.path // on recupere la forme de donnee qu'on veut recuperer sois par extension ou par le nom ex: par le nom file.filename
 
         const newRapport = new Rapport({
         title,
@@ -32,6 +32,16 @@ const createRapport = async (req, res) => {
         return res.status(500).json({message: "Une erreur s'est produite"})
     }
 }
+
+const getRapport = async (req, res) => {
+    try {
+        const rapport = await Rapport.find({})
+        return res.status(200).json(rapport)
+    } catch (error) {
+        return res.status(500).json({message: "Impossible de recuperer les rapports"})
+    }
+}
+
 
 const deleteRapport = async (req, res) => {
     const {id} = req.params
@@ -79,5 +89,6 @@ const updateRapport = async (req, res) => {
 module.exports = {
     createRapport,
     deleteRapport,
-    updateRapport
+    updateRapport,
+    getRapport
 }

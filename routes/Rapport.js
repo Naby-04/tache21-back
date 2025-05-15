@@ -1,9 +1,10 @@
 const express = require("express")
-const { createRapport, deleteRapport, updateRapport } = require("../controllers/rapportController")
+const { createRapport, deleteRapport, updateRapport, getRapport } = require("../controllers/rapportController")
 const upload = require("../middlewares/upload")
 const router = express.Router()
 
 router.post("/create",upload.single("fileUrl"), createRapport)
+router.get("/all", getRapport)
 router.delete("/delete/:id", deleteRapport)
 router.put("/update/:id", updateRapport)
 
