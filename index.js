@@ -4,14 +4,13 @@ const cors = require("cors");
 const connectDB = require("./config/db.js");
 
 
-
-const rapportRoute = require("./routes/Rapport")
-
-
 dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(cors());
+
+const rapportRoutes = require("./routes/Rapport");
+app.use("/rapport", rapportRoutes);
 
 
 connectDB()
