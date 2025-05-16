@@ -2,6 +2,7 @@ const Rapport = require("../model/rapportModel");
 const mongoose = require("mongoose")
 
 
+
 const createRapport = async (req, res) => {
     const {title, description, category, tags} = req.body
     const file = req.file //on recupere le nom depuis le middleware update
@@ -19,7 +20,7 @@ const createRapport = async (req, res) => {
         description,
         fileUrl,
         category,
-        tags
+        tags,
     })
 
     await newRapport.save()
@@ -40,6 +41,22 @@ const getRapport = async (req, res) => {
     } catch (error) {
         return res.status(500).json({message: "Impossible de recuperer les rapports"})
     }
+}
+
+const getOneRapport = async (req, res) => {
+    const {id} = req.params
+
+    if(!mongoose.Types.ObjectId.isValid(id)){
+        return res.status(400).json({message: "impossible de trouver l'id"})
+    }
+
+    const existingRapport = await Rapport.findById(id)
+
+    if(!existingRapport){
+        return res.status(409).json({msg: "Rapport introuvable"})
+    }
+
+    return res.status(201).json({msg: "Rapport trouve,", rapport: existingRapport})
 }
 
 
@@ -90,5 +107,6 @@ module.exports = {
     createRapport,
     deleteRapport,
     updateRapport,
-    getRapport
+    getRapport,
+    getOneRapport
 }

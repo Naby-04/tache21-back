@@ -4,7 +4,7 @@ const cors = require("cors");
 const connectDB = require("./config/db.js");
 const {errorHandler} = require("./middlewares/errorMiddleware.js")
 const usersRoutes = require("./routes/usersRoutes.js")
-const rapportRoutes = require("./routes/Rapport");
+const rapportRoutes = require("./routes/Rapport.js");
 
 dotenv.config();
 const app = express();
@@ -19,10 +19,10 @@ app.use(errorHandler);
 app.use("/api/users", usersRoutes);
 app.use("/rapport", rapportRoutes);
 
-
 connectDB()
 .then(() => {
-    app.listen(process.env.PORT,"0.0.0.0", () => {
+    app.listen(process.env.PORT, () => {
       console.log(`Server running on port ${process.env.PORT}`);
     });
   });
+
