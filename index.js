@@ -21,7 +21,7 @@ const app = express();
 
 // ✅ 1. CORS en premier !
 app.use(cors({
-  origin: "https://senrapport.netlify.app",
+  origin: "http://localhost:5173",
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
