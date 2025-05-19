@@ -10,10 +10,6 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    nom: {
-      type: String,
-      required: true,
-    },
     email: {
       type: String,
       required: true,
@@ -33,6 +29,9 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+     
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
   },
   { timestamps: true }
 );
@@ -45,6 +44,7 @@ UserSchema.methods.generateToken = function () {
     { expiresIn: "90d" }
   );
 };
+// refresh
 
 UserSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
