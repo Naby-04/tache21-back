@@ -12,21 +12,24 @@ const createRapport = async (req, res) => {
     
 
     try {
-        const fileUrl = file.path // on recupere la forme de donnee qu'on veut recuperer sois par extension ou par le nom ex: par le nom file.filename
+        const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${encodeURIComponent(file.filename)}`;
+        console.log("fileUrl",fileUrl)
 
         const newRapport = new Rapport({
         title,
         description,
         fileUrl,
         category,
-        tags
+        tags,
+        type: file.mimetype,
+        date: Date.now().toLocaleString(),
     })
 
+    console.log("fileName",newRapport.type);
+    
     await newRapport.save()
     return res.status(201).json({message: "Rapport crée", rapport:newRapport})
     }
-
-    
     catch (error) {
         console.error(error)
         return res.status(500).json({message: "Une erreur s'est produite"})
@@ -42,10 +45,8 @@ const getRapport = async (req, res) => {
     }
 }
 
-
 const deleteRapport = async (req, res) => {
     const {id} = req.params
-
     if(!mongoose.Types.ObjectId.isValid(id)){
         return res.status(400).json({message: "impossible de trouver l'id"})
     }

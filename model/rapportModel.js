@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const rapportSchema = new mongoose.Schema({
+    rapportId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Rapport",
+    },
    title: {
     type: String,
     required: true,
@@ -20,7 +24,11 @@ const rapportSchema = new mongoose.Schema({
    },
    tags: {
     type: String,
-   }
+   },
+   type: {
+    type: String,
+   },
+
     // userId: {
     //     type: mongoose.Schema.Types.ObjectId,
     //     ref: "User",

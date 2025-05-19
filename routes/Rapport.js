@@ -3,8 +3,8 @@ const { createRapport, deleteRapport, updateRapport, getRapport } = require("../
 const upload = require("../middlewares/upload")
 const router = express.Router()
 
-router.post("/create",upload.single("fileUrl"), createRapport)
-router.get("/all", getRapport)
+router.post("/create",upload.single("file"), createRapport)
+router.get("/getAll", getRapport)
 router.delete("/delete/:id", deleteRapport)
 router.put("/update/:id", updateRapport)
 
