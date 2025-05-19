@@ -3,12 +3,13 @@ const { createRapport, deleteRapport, updateRapport, getRapport, getOneRapport }
 const upload = require("../middlewares/upload")
 const {protect} = require("../middlewares/authMiddleware")
 const router = express.Router()
+// const {protect} = require("../middlewares/authMiddleware")
 
-
-router.post("/create",upload.single("file"), createRapport)
-router.get("/getAll", getRapport)
-router.delete("/delete/:id", deleteRapport)
-router.put("/update/:id", updateRapport)
+router.post("/create", protect, upload.single("fileUrl"), createRapport)
+router.get("/all", protect, getRapport)
+router.delete("/:id", protect, deleteRapport)
+router.put("/:id", protect, updateRapport)
+router.get("/one/:id", protect, getOneRapport)
 
 /**
  * @swagger
@@ -150,11 +151,7 @@ router.put("/update/:id", updateRapport)
  */
 
 
-router.post("/create", protect, upload.single("fileUrl"), createRapport)
-router.get("/all", protect, getRapport)
-router.delete("/:id", protect, deleteRapport)
-router.put("/:id", protect, updateRapport)
-router.get("/one/:id", protect, getOneRapport)
+
 
 
 module.exports = router
