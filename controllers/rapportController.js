@@ -17,8 +17,6 @@ const createRapport = async (req, res) => {
         const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${encodeURIComponent(file.filename)}`;
         console.log("fileUrl",fileUrl)
 
-
-        // const fileUrl = file.path // on recupere la forme de donnee qu'on veut recuperer sois par extension ou par le nom ex: par le nom file.filename
         const newRapport = new Rapport({
         title,
         description,
