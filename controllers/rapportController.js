@@ -1,45 +1,48 @@
 const Rapport = require("../model/rapportModel");
 const mongoose = require("mongoose")
+const cloudinary = require("../utils/cloudinary.js");
+// const fs = require("fs");
+
 
 
 
 const createRapport = async (req, res) => {
-    const {title, description, category, tags} = req.body
-    const file = req.file //on recupere le nom depuis le middleware update
+  const { title, description, category, tags } = req.body;
+  const file = req.file;
 
-    if(!title || !description || !file || !category){
-        return res.status(400).json({message: "Veuillez renseigner ces champs"})
-    }
-    
+  if (!title || !description || !file || !category) {
+    return res.status(400).json({ message: "Veuillez renseigner tous les champs requis" });
+  }
 
-    try {
+  try {
+    // Conversion du buffer en base64
+    const base64File = `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
 
-        const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${encodeURIComponent(file.filename)}`;
-        console.log("fileUrl",fileUrl)
+    // Upload vers Cloudinary
+    const uploadResult = await cloudinary.uploader.upload(base64File, {
+      resource_type: "auto",
+      folder: "rapports"
+    });
 
-        const newRapport = new Rapport({
-        title,
-        description,
-        fileUrl,
-        category,
-        tags,
-        type: file.mimetype,
-        date: Date.now().toLocaleString(),
+    const newRapport = new Rapport({
+      title,
+      description,
+      fileUrl: uploadResult.secure_url, // ✅ URL Cloudinary
+      category,
+      tags,
+      type: file.mimetype,
+      user: req.user.id
+    });
 
-        user: req.user.id
-    })
+    await newRapport.save();
 
-    console.log("fileName",newRapport.type);
-    
-    await newRapport.save()
+    res.status(201).json({ message: "Rapport créé", rapport: newRapport });
 
-    return res.status(201).json({message: "Rapport crée", rapport:newRapport})
-    }
-    catch (error) {
-       console.error("Erreur dans /create:", error); // ➤ pour voir le vrai message
-    res.status(500).json({ message: "Une erreur s'est produite" });
-    }
-}
+  } catch (error) {
+    console.error("Erreur dans createRapport :", error);
+    res.status(500).json({ message: "Erreur lors de la création du rapport" });
+  }
+};
 
 const getRapport = async (req, res) => {
     try {

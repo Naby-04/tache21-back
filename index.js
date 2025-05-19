@@ -1,62 +1,51 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const path = require("path");
 const connectDB = require("./config/db.js");
-
 const { errorHandler } = require("./middlewares/errorMiddleware.js");
+
 const usersRoutes = require("./routes/usersRoutes.js");
 const rapportRoutes = require("./routes/Rapport");
-const path = require("path");
+const commentRoutes = require("./routes/commentRoutes.js");
 
-
-// swagger module
+// Swagger
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./sawgger");
 
-const commentRoutes = require('./routes/commentRoutes.js')
-
-
 dotenv.config();
+
 const app = express();
 
-// ✅ 1. CORS en premier !
+// ✅ 1. CORS
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "http://localhost:5173", // ou ton domaine frontend déployé
   methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
+  credentials: true,
 }));
 
-// ✅ 2. JSON + urlencoded
+// ✅ 2. Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ✅ 3. Routes API
 app.use("/api/users", usersRoutes);
 app.use("/rapport", rapportRoutes);
-app.use("/api/comments", commentRoutes)
+app.use("/api/comments", commentRoutes);
 
+// ✅ 4. Swagger
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// ✅ 4. Fichiers statiques : après les routes
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// ✅ 5. (Optionnel) Dossier statique local
+// ❌ Tu peux supprimer cette ligne si tu utilises Cloudinary maintenant
+// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// ✅ 5. Gestion des erreurs
+// ✅ 6. Gestion des erreurs
 app.use(errorHandler);
 
-// ✅ 6. Connexion & démarrage serveur
+// ✅ 7. Démarrage serveur
 connectDB().then(() => {
   app.listen(process.env.PORT, () => {
     console.log(`✅ Server running on port ${process.env.PORT}`);
   });
 });
-
-// routesSwagger
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec))
-
-connectDB()
-.then(() => {
-    app.listen(process.env.PORT, () => {
-      console.log(`Server running on port ${process.env.PORT}`);
-    });
-  });
-
-

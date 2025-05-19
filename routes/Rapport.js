@@ -3,7 +3,6 @@ const { createRapport, deleteRapport, updateRapport, getRapport, getOneRapport }
 const upload = require("../middlewares/upload")
 const {protect} = require("../middlewares/authMiddleware")
 const router = express.Router()
-// const {protect} = require("../middlewares/authMiddleware")
 
 router.post("/create", protect, upload.single("fileUrl"), createRapport)
 router.get("/all", protect, getRapport)

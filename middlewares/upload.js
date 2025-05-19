@@ -1,32 +1,20 @@
+// middlewares/multer.js
 const multer = require("multer");
-const path = require("path");
 
-//on definit ou sotcker le fichier et le nom
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/"); // ici la destination s'appelle uploads
-  },
-  
-  filename: function (req, file, cb) {
-    const uniqueName = Date.now() + "-" + file.originalname; // ici on le nom du fichier en la rendant unique pour eviter les doublons
-    cb(null, uniqueName);
-  }
-});
+// On stocke le fichier dans la RAM (pas sur le disque)
+const storage = multer.memoryStorage();
 
-// filtre des extensions autorisées
 const fileFilter = (req, file, cb) => {
   const allowedExtensions = [".pdf", ".doc", ".docx"];
-  const ext = path.extname(file.originalname).toLowerCase(); // on initialise l'extension
+  const ext = file.originalname.split('.').pop().toLowerCase();
 
-  if (allowedExtensions.includes(ext)) {
-    cb(null, true); // on accepte le fichier 
+  if (allowedExtensions.includes("." + ext)) {
+    cb(null, true);
   } else {
     cb(new Error("Seuls les fichiers Word et PDF sont autorisés."), false);
   }
 };
 
-
-// cration de l'objet multer avec sa config
 const upload = multer({ storage, fileFilter });
 
 module.exports = upload;
