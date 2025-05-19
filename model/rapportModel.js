@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { v4: uuidv4 } = require("uuid");
 
 const rapportSchema = new mongoose.Schema({
    title: {
@@ -20,13 +21,18 @@ const rapportSchema = new mongoose.Schema({
    },
    tags: {
     type: String,
-   }
-    // userId: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "User",
-    //     required: true,
-    // },
-}, {timestamps: true});
+   },
+    user: {
+        type: String,
+        ref: "User",
+        required: true,
+    },
+
+    _id: {
+        type: String,
+        default: uuidv4,
+    }
+}, {timestamps: true, _id: false});
 
 module.exports = mongoose.model("Rapport", rapportSchema);
 

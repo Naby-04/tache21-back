@@ -6,6 +6,10 @@ const {errorHandler} = require("./middlewares/errorMiddleware.js")
 const usersRoutes = require("./routes/usersRoutes.js")
 const rapportRoutes = require("./routes/Rapport.js");
 
+// swagger module
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./sawgger");
+
 dotenv.config();
 const app = express();
 
@@ -18,6 +22,9 @@ app.use(errorHandler);
 // Routes
 app.use("/api/users", usersRoutes);
 app.use("/rapport", rapportRoutes);
+
+// routesSwagger
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 connectDB()
 .then(() => {
