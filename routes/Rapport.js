@@ -144,11 +144,11 @@ const router = express.Router()
  */
 
 
-router.post("/create", protect, upload.single("fileUrl"), createRapport)
-router.get("/all", protect, getRapport)
-router.delete("/:id", protect, deleteRapport)
-router.put("/:id", protect, updateRapport)
-router.get("/one/:id", protect, getOneRapport)
+router.post("/create", upload.single("fileUrl"), createRapport)
+router.get("/all", getRapport)
+router.delete("/:id", deleteRapport)
+router.put("/:id", updateRapport)
+router.get("/one/:id", getOneRapport)
 
 module.exports = router
 
