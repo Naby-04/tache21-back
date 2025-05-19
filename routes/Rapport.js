@@ -1,18 +1,40 @@
 const express = require("express")
-const { createRapport, deleteRapport, updateRapport, getRapport, getOneRapport, getMyAllRapport, deleteMyRapport, updateMyRapport } = require("../controllers/rapportController")
+const { createRapport,
+        getAllRapports,
+        getRapportById,
+        deleteRapport,
+        updateRapport,
+        getUserRapports,
+        deleteUserRapport,
+        updateUserRapport 
+    } = require("../controllers/rapportController")
+
 const upload = require("../middlewares/upload")
 const {protect} = require("../middlewares/authMiddleware")
 const router = express.Router()
+
+
+
+router.post("/create",protect, upload.single("fileUrl"), createRapport)
+router.get("/all", getAllRapports)
+router.delete("/:id", deleteRapport)
+router.put("/:id", updateRapport)
+router.get("/one/:id", getRapportById)
+
+router.get("/getMyRapport",protect, getUserRapports)
+router.delete("/deleteMyRapport/:id",protect, deleteUserRapport)
+router.put("/updateMyRapport/:id",protect, updateUserRapport)
+
+
+module.exports = router
+
 
 /**
  * @swagger
  * tags:
  *   name: Rapport
  *   description: API de gestion des rapports de mémoire
- */
-
-/**
- * @swagger
+ *
  * components:
  *   schemas:
  *     Rapport:
@@ -27,24 +49,28 @@ const router = express.Router()
  *           description: ID généré automatiquement
  *         titre:
  *           type: string
+ *           description: Titre du rapport
  *         auteur:
  *           type: string
+ *           description: Auteur du rapport
  *         description:
  *           type: string
+ *           description: Description du rapport
  *         fileUrl:
  *           type: string
  *           format: binary
+ *           description: Chemin vers le fichier uploadé
  *         date:
  *           type: string
- *           format: date
- */
-
-/**
- * @swagger
+ *           format: date-time
+ *           description: Date de création du rapport
+ *
  * /rapport/create:
  *   post:
- *     summary: Créer un nouveau rapport
- *     tags: [Rapports]
+ *     summary: Créer un nouveau rapport avec upload de fichier
+ *     tags: [Rapport]
+ *     security:
+ *       - bearerAuth: []
  *     consumes:
  *       - multipart/form-data
  *     requestBody:
@@ -56,62 +82,59 @@ const router = express.Router()
  *             properties:
  *               title:
  *                 type: string
- *               category: 
- *                  type: string
+ *                 description: Titre du rapport
+ *               category:
+ *                 type: string
+ *                 description: Catégorie du rapport
  *               description:
  *                 type: string
+ *                 description: Description du rapport
  *               fileUrl:
  *                 type: string
  *                 format: binary
+ *                 description: Fichier du rapport à uploader
  *     responses:
  *       201:
  *         description: Rapport créé avec succès
- */
-
-/**
- * @swagger
+ *       401:
+ *         description: Non autorisé, token manquant ou invalide
+ *
  * /rapport/all:
  *   get:
- *     summary: Récupérer tous les rapports
- *     tags: [Rapports]
+ *     summary: Récupérer la liste de tous les rapports
+ *     tags: [Rapport]
  *     responses:
  *       200:
- *         description: Liste de tous les rapports
- */
-
-/**
- * @swagger
+ *         description: Liste de rapports retournée avec succès
+ *
  * /rapport/one/{id}:
  *   get:
- *     summary: Obtenir un rapport spécifique par ID
- *     tags: [Rapports]
+ *     summary: Obtenir un rapport spécifique par son ID
+ *     tags: [Rapport]
  *     parameters:
  *       - in: path
  *         name: id
- *         required: true
  *         schema:
  *           type: string
- *         description: ID du rapport
+ *         required: true
+ *         description: ID du rapport à récupérer
  *     responses:
  *       200:
  *         description: Rapport récupéré avec succès
  *       404:
  *         description: Rapport non trouvé
- */
-
-/**
- * @swagger
+ *
  * /rapport/{id}:
  *   put:
  *     summary: Mettre à jour un rapport existant
- *     tags: [Rapports]
+ *     tags: [Rapport]
  *     parameters:
  *       - in: path
  *         name: id
- *         required: true
  *         schema:
  *           type: string
- *         description: ID du rapport
+ *         required: true
+ *         description: ID du rapport à mettre à jour
  *     requestBody:
  *       required: true
  *       content:
@@ -121,39 +144,78 @@ const router = express.Router()
  *     responses:
  *       200:
  *         description: Rapport mis à jour avec succès
- */
-
-/**
- * @swagger
- * /rapport/{id}:
+ *       404:
+ *         description: Rapport non trouvé
+ *
+ * /rapport/delete/{id}:
  *   delete:
- *     summary: Supprimer un rapport
- *     tags: [Rapports]
+ *     summary: Supprimer un rapport par son ID
+ *     tags: [Rapport]
  *     parameters:
  *       - in: path
  *         name: id
- *         required: true
  *         schema:
  *           type: string
+ *         required: true
  *         description: ID du rapport à supprimer
  *     responses:
  *       200:
  *         description: Rapport supprimé avec succès
  *       404:
  *         description: Rapport non trouvé
+ *
+ * /rapport/getMyRapport:
+ *   get:
+ *     summary: Récupérer tous les rapports de l'utilisateur connecté
+ *     tags: [Rapport]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Liste des rapports de l'utilisateur retournée avec succès
+ *       401:
+ *         description: Non autorisé, token manquant ou invalide
+ *
+ * /rapport/deleteMyRapport:
+ *   delete:
+ *     summary: Supprimer un rapport de l'utilisateur connecté
+ *     tags: [Rapport]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: string
+ *                 description: ID du rapport à supprimer
+ *     responses:
+ *       200:
+ *         description: Rapport supprimé avec succès
+ *       401:
+ *         description: Non autorisé
+ *
+ * /rapport/updateMyRapport:
+ *   put:
+ *     summary: Mettre à jour un rapport de l'utilisateur connecté
+ *     tags: [Rapport]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Rapport'
+ *     responses:
+ *       200:
+ *         description: Rapport mis à jour avec succès
+ *       401:
+ *         description: Non autorisé
  */
 
-
-router.post("/create", upload.single("fileUrl"), createRapport)
-router.get("/all", getRapport)
-router.delete("/:id", deleteRapport)
-router.put("/:id", updateRapport)
-router.get("/one/:id", getOneRapport)
-
-router.post("/getMyRapport",protect, getAllMyRapport)
-router.delete("/deleteMyRapport",protect, deleteAllMyRapport)
-router.post("/updateMyRapport",protect, getAllMyRapport)
-
-module.exports = router
 
 //le upload.single("fichier") permet de recuperer le fichier , LE STOCK DANS uploads avec un nom unique et ajoute un obbet req.file. Ainsi la createRapport pour stocker le req.file.path dans le fileUrl

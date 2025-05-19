@@ -22,17 +22,19 @@ const rapportSchema = new mongoose.Schema({
    tags: {
     type: String,
    },
-    user: {
-        type: String,
-        ref: "User",
-        required: true,
-    },
+   type: {
+    type: String,
+   },
+   user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+},
+    // userId: {
+    //     type: mongoose.Schema.Types.ObjectId,x
+    //     required: true,
+    // },
+}, {timestamps: true});
 
-    _id: {
-        type: String,
-        default: uuidv4,
-    }
-}, {timestamps: true, _id: false});
 
 module.exports = mongoose.model("Rapport", rapportSchema);
 
