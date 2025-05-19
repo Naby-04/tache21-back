@@ -24,7 +24,6 @@ app.use("/rapport", rapportRoutes);
 app.use("/post", require("./routes/PostRoute"));
 
 
-
 app.use((req, res, next) => {
     console.log(req.path, req.method);
     next();
