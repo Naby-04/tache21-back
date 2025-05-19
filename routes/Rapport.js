@@ -1,5 +1,5 @@
 const express = require("express")
-const { createRapport, deleteRapport, updateRapport, getRapport, getOneRapport } = require("../controllers/rapportController")
+const { createRapport, deleteRapport, updateRapport, getRapport, getOneRapport, getMyAllRapport, deleteMyRapport, updateMyRapport } = require("../controllers/rapportController")
 const upload = require("../middlewares/upload")
 const {protect} = require("../middlewares/authMiddleware")
 const router = express.Router()
@@ -149,6 +149,10 @@ router.get("/all", getRapport)
 router.delete("/:id", deleteRapport)
 router.put("/:id", updateRapport)
 router.get("/one/:id", getOneRapport)
+
+router.post("/getMyRapport",protect, getAllMyRapport)
+router.delete("/deleteMyRapport",protect, deleteAllMyRapport)
+router.post("/updateMyRapport",protect, getAllMyRapport)
 
 module.exports = router
 

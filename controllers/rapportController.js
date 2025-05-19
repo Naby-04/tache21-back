@@ -37,7 +37,7 @@ const createRapport = async (req, res) => {
 
 const getRapport = async (req, res) => {
     try {
-        const rapport = await Rapport.find({user: req.user.id}).sort({createdAt: -1})
+        const rapport = await Rapport.find({}).sort({createdAt: -1})
         return res.status(200).json(rapport)
     } catch (error) {
         return res.status(500).json({message: "Impossible de recuperer les rapports"})
@@ -52,7 +52,7 @@ const getOneRapport = async (req, res) => {
 
     const existingRapport = await Rapport.findOne({
         _id: req.params.id,
-        user: req.user.id
+
     })
 
     if(!existingRapport){
@@ -72,7 +72,6 @@ const deleteRapport = async (req, res) => {
     try {
         const rapport = await Rapport.findOneAndDelete({
             _id: req.params.id,
-            user: req.user.id
         })
 
         if(!rapport){
@@ -93,7 +92,7 @@ const updateRapport = async (req, res) => {
     }
 
     try {
-        const rapport = await Rapport.findOneAndUpdate({_id: req.params.id, user: req.user.id}, req.body, {new: true})
+        const rapport = await Rapport.findOneAndUpdate({_id: req.params.id}, req.body, {new: true})
 
         if(!rapport){
             return res.status(401).json({msg : "Rapport introuvable"})
@@ -107,12 +106,60 @@ const updateRapport = async (req, res) => {
     }
 }
 
+const getMyAllRapport = async (req, res) => {
+    try {
+        const rapport = await Rapport.find({user: req.user.id}).sort({createdAt: -1})
+        return res.status(200).json(rapport)
+    } catch (error) {
+        return res.status(500).json({message: "Impossible de recuperer les rapports"})
+    }
+}
+
+const deleteMyRapport = async (req, res) => {
+    try{
+        const rapportId = await Rapport.findOneAndDelete({
+            _id:req.params.id,
+            user: req.user.id
+        })
+
+        if(!rapportId){
+            return res.status(404).json({msg : "Rapport introuvable"})
+        }
+
+        return res.status(200).json({msg: "Rapport supprime", rapport: rapportId})
+    }catch(error){
+        return res.status(500).json({message: "Une erreur s'est produite"})
+    }
+}
+
+const updateMyRapport = async (req, res) => {
+
+    if(!mongoose.Types.ObjectId.isValid(req.params.id)){
+        return res.status(400).json({message: "impossible de trouver l'id"})
+    }
+
+    try {
+        const rapport = await Rapport.findOneAndUpdate({_id: req.params.id, user: req.params.id}, req.body, {new: true})
+
+        if(!rapport){
+            return res.status(401).json({msg : "Rapport introuvable"})
+        }
+
+        return res.status(200).json({msg: "Rapport modife avec succes" , rapport: rapport})
+    } catch (error) {
+        return res.status(500).json({message: "Une erreur s'est produite"})
+    }
+}
+
 module.exports = {
     createRapport,
     deleteRapport,
     updateRapport,
     getRapport,
-    getOneRapport
+    getOneRapport,
+    getMyAllRapport,
+    deleteMyRapport,
+    updateMyRapport
 }
 
 // Commentaires swagger 
