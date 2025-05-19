@@ -2,10 +2,16 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const connectDB = require("./config/db.js");
+
 const { errorHandler } = require("./middlewares/errorMiddleware.js");
 const usersRoutes = require("./routes/usersRoutes.js");
 const rapportRoutes = require("./routes/Rapport");
 const path = require("path");
+
+
+// swagger module
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./sawgger");
 
 dotenv.config();
 const app = express();
@@ -25,6 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/users", usersRoutes);
 app.use("/rapport", rapportRoutes);
 
+
 // ✅ 4. Fichiers statiques : après les routes
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
@@ -37,3 +44,15 @@ connectDB().then(() => {
     console.log(`✅ Server running on port ${process.env.PORT}`);
   });
 });
+
+// routesSwagger
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+
+connectDB()
+.then(() => {
+    app.listen(process.env.PORT, () => {
+      console.log(`Server running on port ${process.env.PORT}`);
+    });
+  });
+
+
