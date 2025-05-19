@@ -13,6 +13,9 @@ const path = require("path");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./sawgger");
 
+const commentRoutes = require('./routes/commentRoutes.js')
+
+
 dotenv.config();
 const app = express();
 
@@ -30,6 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 // ✅ 3. Routes API
 app.use("/api/users", usersRoutes);
 app.use("/rapport", rapportRoutes);
+app.use("/api/comments", commentRoutes)
 
 
 // ✅ 4. Fichiers statiques : après les routes
