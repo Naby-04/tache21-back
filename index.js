@@ -5,6 +5,7 @@ const connectDB = require("./config/db.js");
 const {errorHandler} = require("./middlewares/errorMiddleware.js")
 const usersRoutes = require("./routes/usersRoutes.js")
 const rapportRoutes = require("./routes/Rapport");
+const commentRoutes = require('./routes/commentRoutes.js')
 
 dotenv.config();
 const app = express();
@@ -18,6 +19,7 @@ app.use(errorHandler);
 // Routes
 app.use("/api/users", usersRoutes);
 app.use("/rapport", rapportRoutes);
+app.use("/api/comments", commentRoutes)
 
 
 connectDB()
