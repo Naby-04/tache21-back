@@ -1,25 +1,27 @@
 const express = require("express")
-const { createRapport, deleteRapport, updateRapport, getRapport, updateMyRapport, getMyAllRapport, getOneRapport} = require("../controllers/rapportController")
+const { createRapport,
+  getAllRapports,
+  getRapportById,
+  deleteRapport,
+  updateRapport,
+  getUserRapports,
+  deleteUserRapport,
+  updateUserRapport,} = require("../controllers/rapportController")
 const upload = require("../middlewares/upload")
 const {protect} = require("../middlewares/authMiddleware")
 const router = express.Router()
 // const {protect} = require("../middlewares/authMiddleware")
 
 router.post("/create", protect, upload.single("fileUrl"), createRapport)
-router.get("/all", protect, getRapport)
+router.get("/all", getAllRapports)
 router.delete("/:id", protect, deleteRapport)
 router.put("/:id", protect, updateRapport)
-router.get("/one/:id", protect, getOneRapport)
+router.get("/one/:id", protect, getRapportById)
 
-router.post("/create", upload.single("fileUrl"), createRapport)
-router.get("/all", getRapport)
-router.delete("/:id", deleteRapport)
-router.put("/:id", updateRapport)
-router.get("/one/:id", getOneRapport)
 
-router.post("/getMyRapport",protect, getMyAllRapport)
-router.delete("/deleteMyRapport",protect, getMyAllRapport)
-router.post("/updateMyRapport",protect, updateMyRapport)
+router.get("/getMyRapport",protect, getUserRapports)
+router.delete("/deleteMyRapport",protect, deleteUserRapport)
+router.post("/updateMyRapport",protect, updateUserRapport)
 
 /**
  * @swagger
