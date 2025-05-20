@@ -7,7 +7,7 @@ const { errorHandler } = require("./middlewares/errorMiddleware.js");
 
 const usersRoutes = require("./routes/usersRoutes.js");
 const rapportRoutes = require("./routes/Rapport");
-const commentRoutes = require("./routes/commentRoutes.js");
+const downloadRoutes = require("./routes/downloadRoutes");
 
 // Swagger
 const swaggerUi = require("swagger-ui-express");
@@ -17,35 +17,36 @@ dotenv.config();
 
 const app = express();
 
-// ✅ 1. CORS
+// ✅ Middleware de base
 app.use(cors({
-  origin: "http://localhost:5173", // ou ton domaine frontend déployé
+  origin: ["http://localhost:5173", "https://senrapport.netlify.app"], // ton frontend
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }));
 
-// ✅ 2. Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ 3. Routes API
+// ✅ Routes
 app.use("/api/users", usersRoutes);
 app.use("/rapport", rapportRoutes);
 app.use("/api/comments", commentRoutes);
 
-// ✅ 4. Swagger
+// ✅ Swagger docs
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// ✅ 5. (Optionnel) Dossier statique local
-// ❌ Tu peux supprimer cette ligne si tu utilises Cloudinary maintenant
-// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-// ✅ 6. Gestion des erreurs
+// ✅ Gestion d’erreurs
 app.use(errorHandler);
 
-// ✅ 7. Démarrage serveur
-connectDB().then(() => {
-  app.listen(process.env.PORT, () => {
-    console.log(`✅ Server running on port ${process.env.PORT}`);
+// routesSwagger
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+
+// ✅ 6. Connexion & démarrage serveur
+connectDB()
+.then(() => {
+    app.listen(process.env.PORT, () => {
+      console.log(`Server running on port ${process.env.PORT}`);
+    });
   });
-});
+
+

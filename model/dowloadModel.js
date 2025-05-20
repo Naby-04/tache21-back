@@ -1,22 +1,21 @@
-const mongoose = require("mongoose");
+// models/downloadModel.js
+const mongoose = require('mongoose');
 
-const dowloadSchema = new mongoose.Schema({
-    userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-    },
+const downloadSchema = new mongoose.Schema({
+  rapportId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Rapport',
+    required: true,
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+  downloadAt: {
+    type: Date,
+    default: Date.now,
+  }
+});
 
-    rapportId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Rapport",
-        required: true,
-    },
-
-    dowloadAt: {
-        type: Date,
-        required: true,
-    }
-}, {timestamps: true});
-
-module.exports = mongoose.model("Dowload", dowloadSchema);
+module.exports = mongoose.model('Download', downloadSchema);

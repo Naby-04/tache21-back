@@ -1,40 +1,57 @@
+const mongoose = require("mongoose");
 const Rapport = require("../model/rapportModel");
-const mongoose = require("mongoose")
-const cloudinary = require("../utils/cloudinary.js");
-// const fs = require("fs");
-
-
-
+const streamifier = require("streamifier")
+const cloudinary = require("../cloudinary")
 
 const createRapport = async (req, res) => {
-  const { title, description, category, tags } = req.body;
-  const file = req.file;
+    const {title, description, category, tags} = req.body
+    const file = req.file //on recupere le nom depuis le middleware update
 
-  if (!title || !description || !file || !category) {
-    return res.status(400).json({ message: "Veuillez renseigner tous les champs requis" });
-  }
+    if(!title || !description || !file || !category){
+        return res.status(400).json({message: "Veuillez renseigner ces champs"})
+    }
+    
 
-  try {
-    // Conversion du buffer en base64
-    const base64File = `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
+    try {
 
-    // Upload vers Cloudinary
-    const uploadResult = await cloudinary.uploader.upload(base64File, {
-      resource_type: "auto",
-      folder: "rapports"
-    });
+      
+         const streamUpload = (fileBuffer) => {
+      return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: "uploads",
+            resource_type: "auto",
+            public_id: `${Date.now()}_${file.originalname
+              .split(".")[0]
+              .replace(/\s+/g, "_")}`,
+          },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+          }
+        );
+        streamifier.createReadStream(fileBuffer).pipe(stream);
+      });
+    };
 
-    const newRapport = new Rapport({
-      title,
-      description,
-      fileUrl: uploadResult.secure_url, // ✅ URL Cloudinary
-      category,
-      tags,
-      type: file.mimetype,
-      user: req.user.id
-    });
+    const result = await streamUpload(file.buffer);
 
-    await newRapport.save();
+        // const fileUrl = file.path // on recupere la forme de donnee qu'on veut recuperer sois par extension ou par le nom ex: par le nom file.filename
+        const newRapport = new Rapport({
+        title,
+        description,
+        fileUrl:result.secure_url,
+        category,
+        tags,
+        type: file.mimetype,
+        date: Date.now().toLocaleString(),
+
+        user: req.user.id
+    })
+
+    console.log("fileName",newRapport.type);
+    
+    await newRapport.save()
 
     res.status(201).json({ message: "Rapport créé", rapport: newRapport });
 
@@ -44,87 +61,123 @@ const createRapport = async (req, res) => {
   }
 };
 
-const getRapport = async (req, res) => {
-    try {
-        const rapport = await Rapport.find({user: req.user.id}).sort({createdAt: -1})
-        console.log("Requête reçue pour getAll");
-        return res.status(200).json(rapport)
-    } catch (error) {
-        return res.status(500).json({message: "Impossible de recuperer les rapports"})
+const getAllRapports = async (req, res) => {
+  try {
+    const rapports = await Rapport.find({}).sort({ createdAt: -1 });
+    return res.status(200).json(rapports);
+  } catch (error) {
+    return res.status(500).json({ message: "Impossible de récupérer les rapports" });
+  }
+};
+
+const getRapportById = async (req, res) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return res.status(400).json({ message: "ID invalide" });
+  }
+
+  try {
+    const rapport = await Rapport.findById(req.params.id);
+    if (!rapport) {
+      return res.status(404).json({ msg: "Rapport introuvable" });
     }
-}
-
-
-const getOneRapport = async (req, res) => {
-
-    if(!mongoose.Types.ObjectId.isValid(req.params.id)){
-        return res.status(400).json({message: "impossible de trouver l'id"})
-    }
-
-    const existingRapport = await Rapport.findOne({
-        _id: req.params.id,
-        user: req.user.id
-    })
-
-    if(!existingRapport){
-        return res.status(409).json({msg: "Rapport introuvable"})
-    }
-
-    return res.status(200).json({msg: "Rapport trouve,", rapport: existingRapport})
-}
-
+    return res.status(200).json({ msg: "Rapport trouvé", rapport });
+  } catch (error) {
+    return res.status(500).json({ message: "Erreur serveur" });
+  }
+};
 
 const deleteRapport = async (req, res) => {
-
-    if(!mongoose.Types.ObjectId.isValid(req.params.id)){
-        return res.status(400).json({message: "impossible de trouver l'id"})
+  try {
+    const rapport = await Rapport.findById(req.params.id);
+    if (!rapport) {
+      return res.status(404).json({ msg: "Rapport introuvable" });
     }
 
-    try {
-        const rapport = await Rapport.findOneAndDelete({
-            _id: req.params.id,
-            user: req.user.id
-        })
-
-        if(!rapport){
-            return res.status(404).json({msg : "Rapport introuvable"})
-        }
-
-        return res.status(200).json({msg: "Rapport supprime", rapport: rapport})
-
-    } catch (error) {
-        return res.status(500).json({message: "Une erreur s'est produite"})
-    }
-}
+    await rapport.deleteOne();
+    return res.status(200).json({ msg: "Rapport supprimé", rapport });
+  } catch (error) {
+    return res.status(500).json({ message: "Erreur serveur" });
+  }
+};
 
 const updateRapport = async (req, res) => {
+  console.log("Données reçues dans req.body :", req.body);
+  console.log("Fichier reçu dans req.file :", req.file);
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return res.status(400).json({ message: "ID invalide" });
+  }
 
-    if(!mongoose.Types.ObjectId.isValid(req.params.id)){
-        return res.status(400).json({message: "impossible de trouver l'id"})
+  const updateData = {
+    ...req.body
+  }
+
+  if(req.file && req.file.path){
+    updateData.fileUrl = req.file.path
+  }
+
+
+  try {
+    const updated = await Rapport.findByIdAndUpdate(req.params.id, updateData, { new: true, runValidators: true });
+    if (!updated) {
+      return res.status(404).json({ msg: "Rapport introuvable" });
+    }
+    return res.status(200).json({ msg: "Rapport modifié", rapport: updated });
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
+const getUserRapports = async (req, res) => {
+  try {
+    const rapports = await Rapport.find({ user: req.user.id }).sort({ createdAt: -1 });
+    return res.status(200).json(rapports);
+  } catch (error) {
+    return res.status(500).json({ message: "Impossible de récupérer les rapports de l'utilisateur" });
+  }
+};
+
+const deleteUserRapport = async (req, res) => {
+  try {
+    const rapport = await Rapport.findOneAndDelete({ _id: req.params.id, user: req.user.id });
+    if (!rapport) {
+      return res.status(404).json({ msg: "Rapport introuvable" });
+    }
+    return res.status(200).json({ msg: "Rapport supprimé", rapport });
+  } catch (error) {
+    return res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
+const updateUserRapport = async (req, res) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return res.status(400).json({ message: "ID invalide" });
+  }
+
+  try {
+    const rapport = await Rapport.findOneAndUpdate(
+      { _id: req.params.id, user: req.user.id },
+      req.body,
+      { new: true }
+    );
+
+    if (!rapport) {
+      return res.status(404).json({ msg: "Rapport introuvable" });
     }
 
-    try {
-        const rapport = await Rapport.findOneAndUpdate({_id: req.params.id, user: req.user.id}, req.body, {new: true})
-
-        if(!rapport){
-            return res.status(401).json({msg : "Rapport introuvable"})
-        }
-
-        return res.status(201).json({msg: "Rapport modifiee", rapport: rapport})
-
-    } catch (error) {
-        console.log(error.message)
-        return res.status(500).json({message: error.message})
-    }
-}
+    return res.status(200).json({ msg: "Rapport modifié avec succès", rapport });
+  } catch (error) {
+    return res.status(500).json({ message: "Erreur serveur" });
+  }
+};
 
 module.exports = {
-    createRapport,
-    deleteRapport,
-    updateRapport,
-    getRapport,
-    getOneRapport
-}
-
-// Commentaires swagger 
-
+  createRapport,
+  getAllRapports,
+  getRapportById,
+  deleteRapport,
+  updateRapport,
+  getUserRapports,
+  deleteUserRapport,
+  updateUserRapport,
+};

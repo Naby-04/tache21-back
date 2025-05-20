@@ -1,9 +1,15 @@
 // middlewares/multer.js
 const multer = require("multer");
+const path = require("path");
+const cloudinary = require("../cloudinary")
 
-// On stocke le fichier dans la RAM (pas sur le disque)
+
+//on definit ou sotcker le fichier et le nom
+
 const storage = multer.memoryStorage();
 
+
+// filtre des extensions autorisées
 const fileFilter = (req, file, cb) => {
   const allowedExtensions = [".pdf", ".doc", ".docx"];
   const ext = file.originalname.split('.').pop().toLowerCase();
@@ -16,5 +22,7 @@ const fileFilter = (req, file, cb) => {
 };
 
 const upload = multer({ storage, fileFilter });
+
+console.log("Middleware multer chargé", upload)
 
 module.exports = upload;
