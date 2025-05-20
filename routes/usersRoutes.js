@@ -23,7 +23,7 @@ router.put("/update", protect, updateUserProfile);
 
 router.get("/allusers", protect ,  getAllUsers);
 
-router.delete("/:id", protect, admin , deleteUser);
+router.delete("/:id", protect,  deleteUser);
 
 
 router.post("/logout", logout)
