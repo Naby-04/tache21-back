@@ -2,38 +2,42 @@ const mongoose = require("mongoose");
 const { v4: uuidv4 } = require("uuid");
 
 const rapportSchema = new mongoose.Schema({
-   title: {
+  title: {
     type: String,
     required: true,
-   },
+  },
 
-   description:{
+  description: {
     type: String,
     required: true,
-   },
-   fileUrl: {
+  },
+
+  fileUrl: {
     type: String,
     required: true,
-   },
-   category : {
+  },
+
+  category: {
     type: String,
     required: true,
-   },
-   tags: {
+  },
+
+  tags: {
     type: String,
-   },
-   type: {
+  },
+
+  type: {
     type: String,
-   },
-   user: {
+  },
+
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-},
-    // userId: {
-    //     type: mongoose.Schema.Types.ObjectId,x
-    //     required: true,
-    // },
-}, {timestamps: true});
+    required: true,
+  },
+
+}, { timestamps: true });
+
 
 
 module.exports = mongoose.model("Rapport", rapportSchema);

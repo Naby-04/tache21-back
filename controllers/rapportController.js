@@ -2,31 +2,44 @@ const mongoose = require("mongoose");
 const Rapport = require("../model/rapportModel");
 
 const createRapport = async (req, res) => {
-  const { title, description, category, tags } = req.body;
-  const file = req.file;
-  console.log(file)
-  if (!title || !description || !file || !category) {
-    return res.status(400).json({ message: "Veuillez renseigner tous les champs obligatoires." });
-  }
+    const {title, description, category, tags} = req.body
+    const file = req.file //on recupere le nom depuis le middleware update
 
-  try {
-    const newRapport = new Rapport({
-      title,
-      description,
-      fileUrl: file.path,
-      category,
-      tags,
-      type: file.mimetype,
-      user: req.user.id,
-    });
+    if(!title || !description || !file || !category){
+        return res.status(400).json({message: "Veuillez renseigner ces champs"})
+    }
+    
 
-    await newRapport.save();
-    return res.status(201).json({ message: "Rapport créé", rapport: newRapport });
-  } catch (error) {
-    console.error("Erreur lors de la création du rapport :", error); 
-    return res.status(500).json({ message: "Une erreur s'est produite",  error: error.message});
-  }
-};
+    try {
+
+        const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${encodeURIComponent(file.filename)}`;
+        console.log("fileUrl",fileUrl)
+
+
+        // const fileUrl = file.path // on recupere la forme de donnee qu'on veut recuperer sois par extension ou par le nom ex: par le nom file.filename
+        const newRapport = new Rapport({
+        title,
+        description,
+        fileUrl,
+        category,
+        tags,
+        type: file.mimetype,
+        date: Date.now().toLocaleString(),
+
+        user: req.user.id
+    })
+
+    console.log("fileName",newRapport.type);
+    
+    await newRapport.save()
+
+    return res.status(201).json({message: "Rapport crée", rapport:newRapport})
+    }
+    catch (error) {
+       console.error("Erreur dans /create:", error); // ➤ pour voir le vrai message
+    res.status(500).json({ message: "Une erreur s'est produite" });
+    }
+}
 
 const getAllRapports = async (req, res) => {
   try {

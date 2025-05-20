@@ -2,7 +2,6 @@ const User = require('../model/userModel')
 const crypto = require("crypto");
 // const nodemailer = require('nodemailer');
 const jwt = require("jsonwebtoken");
-const sendEmail = require("../utils/sendEmail.js"); // à créer juste après
 const cookieParser = require("cookie-parser");
 // const bcrypt = require("bcryptjs");
 
@@ -180,90 +179,9 @@ const deleteUser = async (req, res) => {
   };
   
 
-  // Mot de passe oublier
-const forgotPassword = async (req, res) => {
-  try {
-    const { email } = req.body;
-
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ status: "Aucun utilisateur trouvé avec cet email" });
-    }
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "15m" });
-
-    const resetUrl = `http://localhost:5173/reset-password/${user._id}/${token}`;
-    const message = `Cliquez sur ce lien pour réinitialiser votre mot de passe : ${resetUrl}`;
-
-    await sendEmail(email, "Réinitialisation de mot de passe", message);
-
-    res.json({ status: "Succès", message: "Email de réinitialisation envoyé" });
-
-  } catch (error) {
-    console.error("Erreur dans forgotPassword :", error);
-    res.status(500).json({ status: "Erreur serveur" });
-  }
-};
-
-module.exports = forgotPassword;
 
 
-
-    // Générer un token sécurisé
-  //   const resetToken = crypto.randomBytes(32).toString("hex");
-  //   const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
-
-  //   // Stocker dans le user
-  //   user.resetPasswordToken = hashedToken;
-  //   user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
-
-  //   await user.save();
-
-  //   // URL de réinitialisation (à ajuster selon ton frontend)
-  //   const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
-  //   const message = `Cliquez sur ce lien pour réinitialiser votre mot de passe : ${resetUrl}`;
-
-  //   await sendEmail(user.email, "Réinitialisation de mot de passe", message);
-
-  //   res.json({ message: "Email de réinitialisation envoyé" });
-  // } catch (error) {
-  //   console.error("Erreur forgotPassword :", error);
-  //   res.status(500).json({ message: "Erreur serveur" });
-  // }
-
-
-
-// reset password
-const resetPassword = async (req, res) => {
-  try {
-    const { password } = req.body;
-    const hashedToken = crypto.createHash("sha256").update(req.params.token).digest("hex");
-
-    const user = await User.findOne({
-      resetPasswordToken: hashedToken,
-      resetPasswordExpire: { $gt: Date.now() },
-    });
-
-    if (!user) {
-      return res.status(400).json({ message: "Token invalide ou expiré" });
-    }
-
-    user.password = password;
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undefined;
-
-    await user.save();
-
-    res.json({ message: "Mot de passe réinitialisé avec succès" });
-  } catch (error) {
-    console.error("Erreur resetPassword :", error);
-    res.status(500).json({ message: "Erreur serveur" });
-  }
-};
-
-
-
-
+ 
 module.exports = {
      createUsers ,
      loginUser,
@@ -272,7 +190,5 @@ module.exports = {
      updateUserProfile,
      getAllUsers,
      deleteUser,
-     forgotPassword,
-     resetPassword,
      logout
     }

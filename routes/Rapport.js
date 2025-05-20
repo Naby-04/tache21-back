@@ -1,40 +1,25 @@
 const express = require("express")
-const { createRapport,
-        getAllRapports,
-        getRapportById,
-        deleteRapport,
-        updateRapport,
-        getUserRapports,
-        deleteUserRapport,
-        updateUserRapport 
-    } = require("../controllers/rapportController")
-
+const { createRapport, deleteRapport, updateRapport, getRapport, updateMyRapport, getMyAllRapport, getOneRapport} = require("../controllers/rapportController")
 const upload = require("../middlewares/upload")
 const {protect} = require("../middlewares/authMiddleware")
 const router = express.Router()
+// const {protect} = require("../middlewares/authMiddleware")
 
+router.post("/create", protect, upload.single("fileUrl"), createRapport)
+router.get("/all", protect, getRapport)
+router.delete("/:id", protect, deleteRapport)
+router.put("/:id", protect, updateRapport)
+router.get("/one/:id", protect, getOneRapport)
 
-router.post("/test-upload", upload.single("file"), (req, res) => {
-  console.log("✅ req.body:", req.body);
-  console.log("✅ req.file:", req.file);
-  if (!req.file) {
-    return res.status(400).json({ message: "Aucun fichier reçu" });
-  }
-  return res.json({ message: "Fichier reçu avec succès", file: req.file });
-});
-router.post("/create",protect, upload.single("file"), createRapport)
-router.get("/all", getAllRapports)
+router.post("/create", upload.single("fileUrl"), createRapport)
+router.get("/all", getRapport)
 router.delete("/:id", deleteRapport)
 router.put("/:id", updateRapport)
-router.get("/one/:id", getRapportById)
+router.get("/one/:id", getOneRapport)
 
-router.get("/getMyRapport",protect, getUserRapports)
-router.delete("/deleteMyRapport/:id",protect, deleteUserRapport)
-router.put("/updateMyRapport/:id",protect, updateUserRapport)
-
-
-module.exports = router
-
+router.post("/getMyRapport",protect, getMyAllRapport)
+router.delete("/deleteMyRapport",protect, getMyAllRapport)
+router.post("/updateMyRapport",protect, updateMyRapport)
 
 /**
  * @swagger
@@ -170,59 +155,11 @@ module.exports = router
  *         description: Rapport supprimé avec succès
  *       404:
  *         description: Rapport non trouvé
- *
- * /rapport/getMyRapport:
- *   get:
- *     summary: Récupérer tous les rapports de l'utilisateur connecté
- *     tags: [Rapport]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Liste des rapports de l'utilisateur retournée avec succès
- *       401:
- *         description: Non autorisé, token manquant ou invalide
- *
- * /rapport/deleteMyRapport:
- *   delete:
- *     summary: Supprimer un rapport de l'utilisateur connecté
- *     tags: [Rapport]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               id:
- *                 type: string
- *                 description: ID du rapport à supprimer
- *     responses:
- *       200:
- *         description: Rapport supprimé avec succès
- *       401:
- *         description: Non autorisé
- *
- * /rapport/updateMyRapport:
- *   put:
- *     summary: Mettre à jour un rapport de l'utilisateur connecté
- *     tags: [Rapport]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Rapport'
- *     responses:
- *       200:
- *         description: Rapport mis à jour avec succès
- *       401:
- *         description: Non autorisé
  */
 
+
+
+
+module.exports = router
 
 //le upload.single("fichier") permet de recuperer le fichier , LE STOCK DANS uploads avec un nom unique et ajoute un obbet req.file. Ainsi la createRapport pour stocker le req.file.path dans le fileUrl
