@@ -1,23 +1,11 @@
 const multer = require("multer");
 const path = require("path");
 const cloudinary = require("../cloudinary")
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
+
 
 //on definit ou sotcker le fichier et le nom
 
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: "uploads",
-    allowed_formats: ["jpg", "jpeg", "png", "pdf", "doc", "docx"],
-    resource_type: "auto",
-    public_id: (req, file) => {
-      const original = file.originalname.replace(/\.[^/.]+$/, ""); // supprime l’extension
-      const cleaned = original.trim().replace(/\s+/g, "_"); // supprime les espaces
-      return `${Date.now()}_${cleaned}`; // ex : "1716209338_mon_fichier"
-    },
-  },
-});
+const storage = multer.memoryStorage();
 
 
 // filtre des extensions autorisées
