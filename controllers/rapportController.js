@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const Rapport = require("../model/rapportModel");
+const streamifier = require("streamifier")
+const cloudinary = require("../cloudinary")
 
 const createRapport = async (req, res) => {
     const {title, description, category, tags} = req.body
@@ -12,15 +14,33 @@ const createRapport = async (req, res) => {
 
     try {
 
-        const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${encodeURIComponent(file.filename)}`;
-        console.log("fileUrl",fileUrl)
+      
+         const streamUpload = (fileBuffer) => {
+      return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: "uploads",
+            resource_type: "auto",
+            public_id: `${Date.now()}_${file.originalname
+              .split(".")[0]
+              .replace(/\s+/g, "_")}`,
+          },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+          }
+        );
+        streamifier.createReadStream(fileBuffer).pipe(stream);
+      });
+    };
 
+    const result = await streamUpload(file.buffer);
 
         // const fileUrl = file.path // on recupere la forme de donnee qu'on veut recuperer sois par extension ou par le nom ex: par le nom file.filename
         const newRapport = new Rapport({
         title,
         description,
-        fileUrl,
+        fileUrl:result.secure_url,
         category,
         tags,
         type: file.mimetype,
@@ -43,7 +63,7 @@ const createRapport = async (req, res) => {
 
 const getAllRapports = async (req, res) => {
   try {
-    const rapports = await Rapport.find().sort({ createdAt: -1 });
+    const rapports = await Rapport.find({}).sort({ createdAt: -1 });
     return res.status(200).json(rapports);
   } catch (error) {
     return res.status(500).json({ message: "Impossible de récupérer les rapports" });
