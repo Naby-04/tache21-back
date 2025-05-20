@@ -21,7 +21,7 @@ const app = express();
 
 // ✅ 1. CORS en premier !
 app.use(cors({
-  origin: "https://senrapport.netlify.app/",
+  origin: ["http://localhost:5173", "https://senrapport.netlify.app"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
@@ -42,16 +42,10 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // ✅ 5. Gestion des erreurs
 app.use(errorHandler);
 
-// ✅ 6. Connexion & démarrage serveur
-connectDB().then(() => {
-  app.listen(process.env.PORT, () => {
-    console.log(`✅ Server running on port ${process.env.PORT}`);
-  });
-});
-
 // routesSwagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
+// ✅ 6. Connexion & démarrage serveur
 connectDB()
 .then(() => {
     app.listen(process.env.PORT, () => {
