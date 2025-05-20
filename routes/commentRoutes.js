@@ -41,8 +41,8 @@ router.get("/:rapportId", async (req, res) => {
       return res.status(404).json({ message: "Rapport introuvable" });
     }
 
-    const comments = await Comment.find({ rapport: rapportId })
-      .populate("user", "prenom email") // pour voir les infos de l’auteur
+    const comments = await Comment.find({ rapport: new mongoose.Types.ObjectId(rapportId) })
+      .populate("user", "prenom email")
       .sort({ createdAt: -1 });
 
     res.status(200).json(comments);
