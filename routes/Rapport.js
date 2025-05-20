@@ -14,8 +14,15 @@ const {protect} = require("../middlewares/authMiddleware")
 const router = express.Router()
 
 
-
-router.post("/create",protect, upload.single("fileUrl"), createRapport)
+router.post("/test-upload", upload.single("file"), (req, res) => {
+  console.log("✅ req.body:", req.body);
+  console.log("✅ req.file:", req.file);
+  if (!req.file) {
+    return res.status(400).json({ message: "Aucun fichier reçu" });
+  }
+  return res.json({ message: "Fichier reçu avec succès", file: req.file });
+});
+router.post("/create",protect, upload.single("file"), createRapport)
 router.get("/all", getAllRapports)
 router.delete("/:id", deleteRapport)
 router.put("/:id", updateRapport)

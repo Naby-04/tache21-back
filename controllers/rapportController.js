@@ -4,7 +4,7 @@ const Rapport = require("../model/rapportModel");
 const createRapport = async (req, res) => {
   const { title, description, category, tags } = req.body;
   const file = req.file;
-
+  console.log(file)
   if (!title || !description || !file || !category) {
     return res.status(400).json({ message: "Veuillez renseigner tous les champs obligatoires." });
   }
@@ -23,8 +23,8 @@ const createRapport = async (req, res) => {
     await newRapport.save();
     return res.status(201).json({ message: "Rapport créé", rapport: newRapport });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Une erreur s'est produite" });
+    console.error("Erreur lors de la création du rapport :", error); 
+    return res.status(500).json({ message: "Une erreur s'est produite",  error: error.message});
   }
 };
 
@@ -68,17 +68,29 @@ const deleteRapport = async (req, res) => {
 };
 
 const updateRapport = async (req, res) => {
+  console.log("Données reçues dans req.body :", req.body);
+  console.log("Fichier reçu dans req.file :", req.file);
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     return res.status(400).json({ message: "ID invalide" });
   }
 
+  const updateData = {
+    ...req.body
+  }
+
+  if(req.file && req.file.path){
+    updateData.fileUrl = req.file.path
+  }
+
+
   try {
-    const updated = await Rapport.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updated = await Rapport.findByIdAndUpdate(req.params.id, updateData, { new: true, runValidators: true });
     if (!updated) {
       return res.status(404).json({ msg: "Rapport introuvable" });
     }
     return res.status(200).json({ msg: "Rapport modifié", rapport: updated });
   } catch (error) {
+    console.log(error)
     return res.status(500).json({ message: "Erreur serveur" });
   }
 };

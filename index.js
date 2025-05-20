@@ -1,43 +1,40 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const path = require("path");
 const connectDB = require("./config/db.js");
 
 const { errorHandler } = require("./middlewares/errorMiddleware.js");
 const usersRoutes = require("./routes/usersRoutes.js");
 const rapportRoutes = require("./routes/Rapport");
 const downloadRoutes = require("./routes/downloadRoutes");
-const path = require("path");
 
-
-// swagger module
+// Swagger
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./sawgger");
 
 dotenv.config();
 const app = express();
 
-// ✅ 1. CORS en premier !
+// ✅ Middleware de base
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "http://localhost:5173", // ton frontend
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
 
-// ✅ 2. JSON + urlencoded
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ 3. Routes API
+// ✅ Routes
 app.use("/api/users", usersRoutes);
 app.use("/rapport", rapportRoutes);
-app.use("/", downloadRoutes)
+app.use("/", downloadRoutes);
 
+// ✅ Swagger docs
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// ✅ 4. Fichiers statiques : après les routes
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-// ✅ 5. Gestion des erreurs
+// ✅ Gestion d’erreurs
 app.use(errorHandler);
 
 // ✅ 6. Connexion & démarrage serveur
@@ -50,11 +47,5 @@ connectDB().then(() => {
 // routesSwagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
-connectDB()
-.then(() => {
-    app.listen(process.env.PORT, () => {
-      console.log(`Server running on port ${process.env.PORT}`);
-    });
-  });
 
 

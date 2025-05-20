@@ -33,13 +33,8 @@ const controllerDownload = async (req, res) => {
       userId,
     });
 
-    // Sert le fichier au client
-    return res.download(filePath, rapport.titre || "rapport.pdf", (err) => {
-      if (err) {
-        console.error("Erreur lors du téléchargement :", err);
-        return res.status(500).json({ message: "Erreur de téléchargement" });
-      }
-    });
+    return res.status(302).redirect(rapport.fileUrl);
+
 
   } catch (error) {
     console.error("Erreur serveur :", error);
