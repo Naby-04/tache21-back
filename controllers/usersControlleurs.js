@@ -1,9 +1,8 @@
 const User = require('../model/userModel')
-// const crypto = require("crypto");
+const crypto = require("crypto");
 // const nodemailer = require('nodemailer');
 const jwt = require("jsonwebtoken");
-
-
+const cookieParser = require("cookie-parser");
 // const bcrypt = require("bcryptjs");
 
 
@@ -23,6 +22,13 @@ const createUsers = async (req, res) => {
 
         // generer le token
         const token = user.generateToken();
+
+        res.cookie("token", token, {
+          httpOnly: true,
+          expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          sameSite: "none",
+          secure: true,
+        })
 
         // renvoyer le token
         res.status(201).json({ 
@@ -75,6 +81,11 @@ const loginUser = async (req, res) => {
       res.status(500).json({ message: "Erreur serveur" });
     }
   };
+
+  const logout = async (req, res) => {
+    res.clearCookie("token");
+    res.status(200).json({ message: "Deconnexion avec success" });
+  }
   
 //GET users
 const getUserProfile = async (req, res) => {
@@ -168,11 +179,9 @@ const deleteUser = async (req, res) => {
   };
   
 
+
+
  
-
-
-
-
 module.exports = {
      createUsers ,
      loginUser,
@@ -181,4 +190,5 @@ module.exports = {
      updateUserProfile,
      getAllUsers,
      deleteUser,
+     logout
     }

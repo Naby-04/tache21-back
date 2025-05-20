@@ -1,5 +1,5 @@
 const express = require("express")
-const { createRapport, deleteRapport, updateRapport, getRapport, getOneRapport } = require("../controllers/rapportController")
+const { createRapport, deleteRapport, updateRapport, getRapport, updateMyRapport, getMyAllRapport, getOneRapport} = require("../controllers/rapportController")
 const upload = require("../middlewares/upload")
 const {protect} = require("../middlewares/authMiddleware")
 const router = express.Router()
@@ -10,6 +10,16 @@ router.get("/all", protect, getRapport)
 router.delete("/:id", protect, deleteRapport)
 router.put("/:id", protect, updateRapport)
 router.get("/one/:id", protect, getOneRapport)
+
+router.post("/create", upload.single("fileUrl"), createRapport)
+router.get("/all", getRapport)
+router.delete("/:id", deleteRapport)
+router.put("/:id", updateRapport)
+router.get("/one/:id", getOneRapport)
+
+router.post("/getMyRapport",protect, getMyAllRapport)
+router.delete("/deleteMyRapport",protect, getMyAllRapport)
+router.post("/updateMyRapport",protect, updateMyRapport)
 
 /**
  * @swagger
@@ -149,7 +159,6 @@ router.get("/one/:id", protect, getOneRapport)
  *       404:
  *         description: Rapport non trouvé
  */
-
 
 
 
