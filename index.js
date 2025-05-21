@@ -21,7 +21,8 @@ const app = express();
 
 // ✅ Middleware de base
 app.use(cors({
-  origin: ["http://localhost:5173", "https://senrapport.netlify.app"], // ton frontend
+  origin: "*",
+  // origin: "https://senrapport.netlify.app/",
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
