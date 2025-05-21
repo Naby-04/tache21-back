@@ -40,7 +40,7 @@ const createRapport = async (req, res) => {
         const newRapport = new Rapport({
         title,
         description,
-        fileUrl:result.secure_url,
+        fileUrl: result.secure_url,
         category,
         tags,
         type: file.mimetype,
@@ -56,8 +56,8 @@ const createRapport = async (req, res) => {
     return res.status(201).json({message: "Rapport crée", rapport:newRapport})
     }
     catch (error) {
-       console.error("Erreur dans /create:", error); // ➤ pour voir le vrai message
-    res.status(500).json({ message: "Une erreur s'est produite" });
+       console.error("Erreur dans /create:", error); 
+        return res.status(500).json({ message: "Une erreur s'est produite" });
     }
 }
 
