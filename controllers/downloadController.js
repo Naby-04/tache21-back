@@ -1,5 +1,3 @@
-const path = require("path");
-const fs = require("fs");
 const mongoose = require("mongoose");
 
 const Download = require("../model/dowloadModel");
@@ -22,18 +20,16 @@ const controllerDownload = async (req, res) => {
     }
 
     // Vérifie que le fichier existe
-    const filePath = path.resolve(rapport.fileUrl);
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ message: "Fichier non trouvé sur le serveur" });
+    if (!rapport.fileUrl || !rapport.fileUrl.startsWith("http")) {
+      return res.status(400).json({ message: "URL de fichier invalide" });
     }
-
     // Enregistre le téléchargement dans la base de données
     await Download.create({
       rapportId: rapport._id,
       userId,
     });
 
-    return res.status(302).redirect(rapport.fileUrl);
+    return res.redirect(rapport.fileUrl);
 
 
   } catch (error) {
