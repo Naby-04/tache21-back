@@ -11,30 +11,35 @@ const createRapport = async (req, res) => {
   const file = req.file;
 
   if (!title || !description || !file || !category) {
-    return res.status(400).json({ message: "Veuillez renseigner tous les champs requis" });
+    return res.status(400).json({ message: "Veuillez renseigner tous les champs requis." });
   }
 
   try {
-    const streamUpload = (file) => {
+    // On récupère le type MIME du fichier
+    const mime = file.mimetype;
+
+    // Fonction pour envoyer le fichier à Cloudinary
+    const streamUpload = (fileBuffer) => {
       return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
           {
-            folder: "rapports",
-            resource_type: "auto",
-            public_id: `${Date.now()}_${file.originalname.split(".")[0].replace(/\s+/g, "_")}`
+            folder: "uploads",
+            public_id: `${Date.now()}_${file.originalname.split(".")[0].replace(/\s+/g, "_")}`,
+            resource_type: mime.includes("pdf") || mime.includes("msword") || mime.includes("officedocument") ? "raw" : "auto",
           },
           (error, result) => {
             if (error) return reject(error);
             resolve(result);
           }
         );
-
-        streamifier.createReadStream(file.buffer).pipe(stream); // ✅ fix ici
+        streamifier.createReadStream(fileBuffer).pipe(stream);
       });
     };
 
-    const result = await streamUpload(file);
+    // Envoie du fichier à Cloudinary
+    const result = await streamUpload(file.buffer);
 
+    // Création du nouveau rapport
     const newRapport = new Rapport({
       title,
       description,
@@ -42,19 +47,19 @@ const createRapport = async (req, res) => {
       category,
       tags,
       type: file.mimetype,
-      date: new Date(), // ✅ mieux que .toLocaleString()
-      user: req.user.id
+      date: new Date().toLocaleString(),
+      user: req.user.id,
     });
 
     await newRapport.save();
-    
-    res.status(201).json({ message: "Rapport créé", rapport: newRapport });
-    console.log("fileUrl cloudinary", newRapport.fileUrl);
+
+    return res.status(201).json({ message: "Rapport créé avec succès", rapport: newRapport });
   } catch (error) {
-    console.error("Erreur dans createRapport :", error);
-    res.status(500).json({ message: "Erreur lors de la création du rapport" });
+    console.error("Erreur dans /createRapport :", error);
+    return res.status(500).json({ message: "Une erreur s'est produite lors de la création du rapport." });
   }
 };
+
 
 
 
