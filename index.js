@@ -8,6 +8,7 @@ const { errorHandler } = require("./middlewares/errorMiddleware.js");
 const usersRoutes = require("./routes/usersRoutes.js");
 const rapportRoutes = require("./routes/Rapport");
 const downloadRoutes = require("./routes/downloadRoutes");
+const commentRoutes = require("./routes/commentRoutes");
 
 // Swagger
 const swaggerUi = require("swagger-ui-express");

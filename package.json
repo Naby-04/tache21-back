@@ -29,7 +29,6 @@
     "streamifier": "^0.1.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
-    "tache21-back": "file:",
-    "uuid": "^11.1.0"
+    "tache21-back": "file:"
   }
 }

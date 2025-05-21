@@ -20,11 +20,7 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // role: {
-    //   type: String,
-    //   enum: ["user", "admin"],
-    //   default: "user",
-    // },
+   
     isAdmin: {
       type: Boolean,
       default: false,
@@ -45,6 +41,9 @@ UserSchema.methods.generateToken = function () {
   );
 };
 // refresh
+
+console.log("address email" , process.env.JWT_SECRET);
+
 
 UserSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
