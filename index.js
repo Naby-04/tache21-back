@@ -3,6 +3,8 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const path = require("path");
 const connectDB = require("./config/db.js");
+const upload = require("./middlewares/upload.js");
+
 const { errorHandler } = require("./middlewares/errorMiddleware.js");
 
 const usersRoutes = require("./routes/usersRoutes.js");
@@ -20,7 +22,8 @@ const app = express();
 
 // ✅ Middleware de base
 app.use(cors({
-  origin: ["http://localhost:5173", "https://senrapport.netlify.app"], // ton frontend
+  origin: "*",
+  // origin: "https://senrapport.netlify.app/",
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }));
@@ -31,7 +34,14 @@ app.use(express.urlencoded({ extended: true }));
 // ✅ Routes
 app.use("/api/users", usersRoutes);
 app.use("/rapport", rapportRoutes);
-app.use("/api/comments", commentRoutes);
+app.use("/api/comments", commentRoutes)
+app.use("/download", downloadRoutes)
+
+app.post("/test-upload", upload.single("file"), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "Aucun fichier reçu" });
+  }
+})
 
 // ✅ Swagger docs
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
