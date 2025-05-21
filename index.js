@@ -1,15 +1,15 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const path = require("path");
 const connectDB = require("./config/db.js");
 
 const { errorHandler } = require("./middlewares/errorMiddleware.js");
 const usersRoutes = require("./routes/usersRoutes.js");
 const rapportRoutes = require("./routes/Rapport");
-const path = require("path");
+const downloadRoutes = require("./routes/downloadRoutes");
 
-
-// swagger module
+// Swagger
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./sawgger");
 
@@ -19,27 +19,26 @@ const commentRoutes = require('./routes/commentRoutes.js')
 dotenv.config();
 const app = express();
 
-// ✅ 1. CORS en premier !
+// ✅ Middleware de base
 app.use(cors({
-  origin: ["http://localhost:5173", "https://senrapport.netlify.app"],
+  origin: "*",
+  // origin: "https://senrapport.netlify.app/",
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
 
-// ✅ 2. JSON + urlencoded
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ 3. Routes API
+// ✅ Routes
 app.use("/api/users", usersRoutes);
 app.use("/rapport", rapportRoutes);
 app.use("/api/comments", commentRoutes)
 
+// ✅ Swagger docs
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// ✅ 4. Fichiers statiques : après les routes
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-// ✅ 5. Gestion des erreurs
+// ✅ Gestion d’erreurs
 app.use(errorHandler);
 
 // routesSwagger
