@@ -42,7 +42,7 @@ router.get("/:rapportId", async (req, res) => {
     }
 
     const comments = await Comment.find({ rapport: rapportId })
-      .populate("user", "prenom email") // pour voir les infos de l’auteur
+      .populate("user", "prenom email") // pour voir les infos de l’auteur => interessant a retenir
       .sort({ createdAt: -1 });
 
     res.status(200).json(comments);

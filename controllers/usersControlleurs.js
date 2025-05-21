@@ -155,7 +155,7 @@ const getUserById = async (req, res) => {
 const getAllUsers = async (req, res) => {
     try {
       const users = await User.find().select("-password"); // sans les mots de passe
-      res.json(users);
+      res.status(200).json(users);
     } catch (error) {
       console.error("Erreur récupération des utilisateurs :", error);
       res.status(500).json({ message: "Erreur serveur" });
@@ -171,7 +171,7 @@ const deleteUser = async (req, res) => {
       if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
   
       await user.deleteOne();
-      res.json({ message: "Utilisateur supprimé avec succès" });
+      res.status(200).json({ message: "Utilisateur supprimé avec succès" });
     } catch (error) {
       console.error("Erreur suppression utilisateur :", error);
       res.status(500).json({ message: "Erreur serveur" });

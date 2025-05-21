@@ -3,7 +3,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const path = require("path");
 const connectDB = require("./config/db.js");
-const upload = require("./middlewares/upload.js");
+const {upload} = require("./middlewares/upload.js");
 
 const { errorHandler } = require("./middlewares/errorMiddleware.js");
 const usersRoutes = require("./routes/usersRoutes.js");

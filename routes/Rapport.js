@@ -8,8 +8,11 @@ const { createRapport,
   deleteUserRapport,
   updateUserRapport
 } = require("../controllers/rapportController")
-const upload = require("../middlewares/upload")
+
+const {upload} = require("../middlewares/upload")
+
 const {protect} = require("../middlewares/authMiddleware")
+
 const router = express.Router()
 // const {protect} = require("../middlewares/authMiddleware")
 
