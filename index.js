@@ -21,7 +21,8 @@ const app = express();
 
 // ✅ 1. CORS en premier !
 app.use(cors({
-  origin: "https://senrapport.netlify.app/",
+  origin: "*",
+  // origin: "https://senrapport.netlify.app/",
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
