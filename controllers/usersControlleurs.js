@@ -1,12 +1,5 @@
 const User = require('../model/userModel')
-const crypto = require("crypto");
-// const nodemailer = require('nodemailer');
-const jwt = require("jsonwebtoken");
-const cookieParser = require("cookie-parser");
-// const bcrypt = require("bcryptjs");
 
-
-// creation d'un utilisateur
 const createUsers = async (req, res) => {
     try {
         const { prenom, email, password , isAdmin} = req.body;
@@ -42,6 +35,7 @@ const createUsers = async (req, res) => {
                 token
             });
             console.log("utilisateur créer", user);
+            console.log("id de user", user._id);
             
     } catch (error) {
         console.error("erreur d'inscription", error);
@@ -52,6 +46,7 @@ const createUsers = async (req, res) => {
 const loginUser = async (req, res) => {
     try {
       const { email, password } = req.body;
+      console.log("email et password", email, password);
    
       // Chercher l'utilisateur
       const user = await User.findOne({ email });

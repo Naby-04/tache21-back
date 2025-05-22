@@ -1,3 +1,4 @@
+const mongoose = require('mongoose')
 const express = require('express')
 const router = express.Router()
 const Comment = require("../model/commentsModel")
@@ -41,8 +42,8 @@ router.get("/:rapportId", async (req, res) => {
       return res.status(404).json({ message: "Rapport introuvable" });
     }
 
-    const comments = await Comment.find({ rapport: rapportId })
-      .populate("user", "prenom email") // pour voir les infos de l’auteur => interessant a retenir
+    const comments = await Comment.find({ rapport: new mongoose.Types.ObjectId(rapportId) })
+      .populate("user", "prenom email")
       .sort({ createdAt: -1 });
 
     res.status(200).json(comments);
@@ -52,6 +53,27 @@ router.get("/:rapportId", async (req, res) => {
   }
 });
 
+// Supprimer un commentaire (auteur ou admin uniquement)
+router.delete("/:id", protect, async (req, res) => {
+  try {
+    const comment = await Comment.findById(req.params.id);
 
+    if (!comment) {
+      return res.status(404).json({ message: "Commentaire introuvable" });
+    }
+
+    // Vérifie que c'est l'auteur OU un admin
+    if (comment.user.toString() !== req.user._id.toString() && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Non autorisé à supprimer ce commentaire" });
+    }
+
+    await comment.deleteOne();
+
+    res.status(200).json({ message: "Commentaire supprimé avec succès" });
+  } catch (error) {
+    console.error("Erreur suppression commentaire :", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
 
 module.exports = router
