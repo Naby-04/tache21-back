@@ -1,20 +1,11 @@
-const nodemailer = require("nodemailer");
+const verificationHtml = (props) => {
+  const { name, url } = props;
 
-const sendEmail = async (to, subject, text) => {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-
-  await transporter.sendMail({
-    from: `"App Support" <${process.env.EMAIL_USER}>`,
-    to,
-    subject,
-    text,
-  });
+  return `
+   <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html dir="ltr" lang="en"><head><link rel="preload" as="image" href="https://res.cloudinary.com/dafwzsod0/image/upload/v1722960272/aqpwn6cmnxhjayqgbjb9.png"/><meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/><meta name="x-apple-disable-message-reformatting"/></head><div style="display:none;overflow:hidden;line-height:1px;opacity:0;max-height:0;max-width:0">Cliquer sur le lien pour confirmer votre compte<div></div></div><body style="background-color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,&quot;Segoe UI&quot;,Roboto,Oxygen-Sans,Ubuntu,Cantarell,&quot;Helvetica Neue&quot;,HelveticaNeue,Helvetica,Arial,sans-serif"><table align="center" width="100%" border="0" cellPadding="0" cellSpacing="0" role="presentation" style="margin:30px auto;height:100px;position:relative"><tbody><tr><td style="text-align: center; padding: 20px 0;"><img height="60" src="https://res.cloudinary.com/dafwzsod0/image/upload/v1722960272/aqpwn6cmnxhjayqgbjb9.png" style="display: block; margin: 0 auto;" width="100"/></td></tr></tbody></table><table align="center" width="100%" border="0" cellPadding="0" cellSpacing="0" role="presentation" style="max-width:37.5em;width:590px;margin:0px auto 30px;background-color:#ffffff;border-radius:5px"><tbody><tr style="width:100%"><td><table align="center" width="100%" border="0" cellPadding="0" cellSpacing="0" role="presentation" style="width:580px;margin:10px auto"><tbody><tr><td><p style="font-size:14px;line-height:1.5;margin:15px 20px">Bonjour ${name},</p><p style="font-size:14px;line-height:1.5;margin:15px 20px">Vous avez récemment créé un compte sur SunuEducation. Pour confirmer votre adresse e-mail, veuillez cliquer sur le bouton ci-dessous.</p><a href="${url}" style="line-height:100%;text-decoration:none;display:block;max-width:100%;background-color:#0d9488;border-radius:4px;color:#fff;font-family:&#x27;Open Sans&#x27;, &#x27;Helvetica Neue&#x27;, Arial;font-size:15px;text-align:center;width:max-content;padding:14px 10px 14px 10px;margin:0px 20px" target="_blank"><span><!--[if mso]><i style="letter-spacing: 10px;mso-font-width:-100%;mso-text-raise:21" hidden>&nbsp;</i><![endif]--></span><span style="max-width:100%;display:inline-block;line-height:120%;mso-padding-alt:0px;mso-text-raise:10.5px">Confirmer mon adresse e-mail</span><span><!--[if mso]><i style="letter-spacing: 10px;mso-font-width:-100%" hidden>&nbsp;</i><![endif]--></span></a><p style="font-size:14px;line-height:1.5;margin:15px 20px">Si vous n&#x27;avez pas créé de compte sur SunuEducation, veuillez ignorer cet e-mail.</p><p style="font-size:14px;line-height:1.5;margin:15px 20px">Cordialement,<br/>L&#x27;équipe SunuEducation</p><hr style="width:100%;border:none;border-top:1px solid #cbd5e1;margin:20px 0"/><p style="font-size:14px;line-height:1.5;margin:15px 20px">Si le bouton ne fonctionne pas, utilisez ce lien : <a href="${url}" style="color:#0d9488;text-decoration:underline" target="_blank">Confirmer mon adresse e-mail</a></p></td></tr></tbody></table></td></tr></tbody></table><table align="center" width="100%" border="0" cellPadding="0" cellSpacing="0" role="presentation" style="width:580px;margin:0 auto"><tbody><tr><td><table align="center" width="100%" border="0" cellPadding="0" cellSpacing="0" role="presentation"><tbody style="width:100%"><tr style="width:100%"><p style="font-size:14px;line-height:24px;margin:16px 0;text-align:center;color:#475569">© 2024 SunuEducation, Tous droits réservés <br/>Darou Salam 2 Pasteur LGI MBAO, Fass Mbao, Dakar - Senegal</p></tr></tbody></table></td></tr></tbody></table></body></html>
+  `;
 };
 
-module.exports = sendEmail;
+module.exports = {
+  verificationHtml
+}
