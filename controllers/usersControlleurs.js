@@ -2,46 +2,104 @@ const User = require('../model/userModel')
 const crypto = require("crypto");
 // const nodemailer = require('nodemailer');
 const jwt = require("jsonwebtoken");
-const sendEmail = require("../utils/sendEmail.js"); // à créer juste après
-
+const cookieParser = require("cookie-parser");
 // const bcrypt = require("bcryptjs");
+const cloudinary = require("../cloudinary");
+
+const updateUserPhoto = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
+
+    // Vérifie si un fichier a bien été envoyé
+    if (!req.file) {
+      return res.status(400).json({ message: "Aucune image envoyée" });
+    }
+
+    // Envoie l'image vers Cloudinary
+    const result = await cloudinary.uploader.upload_stream(
+      {
+        resource_type: "image",
+        folder: "utilisateurs", // Dossier Cloudinary
+      },
+      async (error, result) => {
+        if (error) {
+          console.error("Erreur upload Cloudinary :", error);
+          return res.status(500).json({ message: "Erreur upload Cloudinary" });
+        }
+
+        // Met à jour le champ profileImage
+        user.profileImage = result.secure_url;
+        const updatedUser = await user.save();
+
+        res.json({
+          message: "Image de profil mise à jour",
+          profileImage: updatedUser.profileImage,
+        });
+      }
+    );
+
+    // Envoie le buffer du fichier à Cloudinary
+    result.end(req.file.buffer);
+  } catch (error) {
+    console.error("Erreur mise à jour photo de profil :", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
 
 
 // creation d'un utilisateur
 const createUsers = async (req, res) => {
-    try {
-        const { prenom, email, password , isAdmin} = req.body;
+  try {
+    const { prenom, email, password, isAdmin } = req.body;
 
-        // vérifier si l'utilisateur existe
-        const userExist = await User.findOne({ email });
-        if (userExist) return res.status(400).json({ message: "Email deja utilisé" });
+    // Vérifie si l'utilisateur existe déjà
+    const userExist = await User.findOne({ email });
+    if (userExist) return res.status(400).json({ message: "Email déjà utilisé" });
 
-        // const hashedPassword = await bcrypt.hash(password, 10);
+    // Image par défaut
+    const defaultImage = "https://i.pinimg.com/736x/3c/ae/07/3cae079ca0b9e55ec6bfc1b358c9b1e2.jpg";
 
-        // creer l'utilisateur
-        const user = await User.create({ prenom, email, password, isAdmin });
+    // Crée l'utilisateur avec l'image par défaut
+    const user = await User.create({
+      prenom,
+      email,
+      password,
+      isAdmin,
+      profileImage: defaultImage,
+    });
 
-        // generer le token
-        const token = user.generateToken();
+    // Génère le token
+    const token = user.generateToken();
 
-        // renvoyer le token
-        res.status(201).json({ 
-             message: "Utilisateur créé",
-             user: {
-                 id: user._id,
-                prenom,
-                email,
-                isAdmin
-                } ,
-                token
-            });
-            console.log("utilisateur créer", user);
-            
-    } catch (error) {
-        console.error("erreur d'inscription", error);
-        res.status(500).json({ message: "Erreur serveur" });
-    }
-}
+    // Envoie le cookie avec le token
+    res.cookie("token", token, {
+      httpOnly: true,
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 jours
+      sameSite: "none",
+      secure: true,
+    });
+
+    // Réponse au client
+    res.status(201).json({
+      message: "Utilisateur créé",
+      user: {
+        id: user._id,
+        prenom,
+        email,
+        isAdmin,
+        profileImage: user.profileImage,
+      },
+      token,
+    });
+
+    console.log("Utilisateur créé :", user);
+  } catch (error) {
+    console.error("Erreur d'inscription :", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
 
 const loginUser = async (req, res) => {
     try {
@@ -75,6 +133,11 @@ const loginUser = async (req, res) => {
       res.status(500).json({ message: "Erreur serveur" });
     }
   };
+
+  const logout = async (req, res) => {
+    res.clearCookie("token");
+    res.status(200).json({ message: "Deconnexion avec success" });
+  }
   
 //GET users
 const getUserProfile = async (req, res) => {
@@ -115,9 +178,10 @@ const getUserById = async (req, res) => {
       user.prenom = req.body.prenom;
     }
 
-    if (req.body.password) {
-      user.password = req.body.password;
-    }
+    if (req.body.newPassword) {
+  user.password = req.body.newPassword;
+}
+
 
     const updatedUser = await user.save();
     const token = updatedUser.generateToken();
@@ -129,6 +193,7 @@ const getUserById = async (req, res) => {
         prenom: updatedUser.prenom,
         email: updatedUser.email, // affichage, mais non modifiable
         isAdmin: updatedUser.isAdmin,
+        profileImage: updatedUser.profileImage,
       },
       token,
     });
@@ -168,90 +233,9 @@ const deleteUser = async (req, res) => {
   };
   
 
-  // Mot de passe oublier
-const forgotPassword = async (req, res) => {
-  try {
-    const { email } = req.body;
-
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ status: "Aucun utilisateur trouvé avec cet email" });
-    }
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "15m" });
-
-    const resetUrl = `http://localhost:5173/reset-password/${user._id}/${token}`;
-    const message = `Cliquez sur ce lien pour réinitialiser votre mot de passe : ${resetUrl}`;
-
-    await sendEmail(email, "Réinitialisation de mot de passe", message);
-
-    res.json({ status: "Succès", message: "Email de réinitialisation envoyé" });
-
-  } catch (error) {
-    console.error("Erreur dans forgotPassword :", error);
-    res.status(500).json({ status: "Erreur serveur" });
-  }
-};
-
-module.exports = forgotPassword;
 
 
-
-    // Générer un token sécurisé
-  //   const resetToken = crypto.randomBytes(32).toString("hex");
-  //   const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
-
-  //   // Stocker dans le user
-  //   user.resetPasswordToken = hashedToken;
-  //   user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
-
-  //   await user.save();
-
-  //   // URL de réinitialisation (à ajuster selon ton frontend)
-  //   const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
-  //   const message = `Cliquez sur ce lien pour réinitialiser votre mot de passe : ${resetUrl}`;
-
-  //   await sendEmail(user.email, "Réinitialisation de mot de passe", message);
-
-  //   res.json({ message: "Email de réinitialisation envoyé" });
-  // } catch (error) {
-  //   console.error("Erreur forgotPassword :", error);
-  //   res.status(500).json({ message: "Erreur serveur" });
-  // }
-
-
-
-// reset password
-const resetPassword = async (req, res) => {
-  try {
-    const { password } = req.body;
-    const hashedToken = crypto.createHash("sha256").update(req.params.token).digest("hex");
-
-    const user = await User.findOne({
-      resetPasswordToken: hashedToken,
-      resetPasswordExpire: { $gt: Date.now() },
-    });
-
-    if (!user) {
-      return res.status(400).json({ message: "Token invalide ou expiré" });
-    }
-
-    user.password = password;
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undefined;
-
-    await user.save();
-
-    res.json({ message: "Mot de passe réinitialisé avec succès" });
-  } catch (error) {
-    console.error("Erreur resetPassword :", error);
-    res.status(500).json({ message: "Erreur serveur" });
-  }
-};
-
-
-
-
+ 
 module.exports = {
      createUsers ,
      loginUser,
@@ -260,6 +244,6 @@ module.exports = {
      updateUserProfile,
      getAllUsers,
      deleteUser,
-     forgotPassword,
-     resetPassword
+     logout,
+     updateUserPhoto,
     }

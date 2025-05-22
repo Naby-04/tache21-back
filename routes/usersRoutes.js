@@ -1,35 +1,31 @@
 const express = require("express");
 const router = express.Router();
-const { protect , admin } = require("../middlewares/authMiddleware")
-const {createUsers,
-        loginUser, 
-        getUserProfile , 
-        getUserById,
-        updateUserProfile,
-        getAllUsers,
-        deleteUser ,
-        forgotPassword,
-        resetPassword
-    } = require("../controllers/usersControlleurs");
+const { protect , admin } = require("../middlewares/authMiddleware");
+const upload = require("../middlewares/uploadImage");
+
+
+const {
+  createUsers,
+  loginUser,
+  getUserProfile,
+  getUserById,
+  updateUserProfile,
+  getAllUsers,
+  deleteUser,
+  logout,
+  updateUserPhoto,
+} = require("../controllers/usersControlleurs");
 
 router.post("/register", createUsers);
-
 router.post("/login", loginUser);
-
 router.get("/profile", protect, getUserProfile);
-
 router.get("/admin/user/:id", protect, admin, getUserById);
-
 router.put("/update", protect, updateUserProfile); 
+router.get("/allusers", protect, getAllUsers);
+router.delete("/:id", protect, deleteUser);
+router.post("/logout", logout);
 
-router.get("/allusers", protect, admin ,  getAllUsers);
+// ✅ Nouvelle route pour la photo de profil
+router.put("/update-photo", protect, upload.single("image"), updateUserPhoto);
 
-router.delete("/:id", protect, admin , deleteUser);
-
-router.post("/forgot-password", forgotPassword);
-router.post("/reset-password/:token", resetPassword)
-
-
-
-
-module.exports = router
+module.exports = router;
