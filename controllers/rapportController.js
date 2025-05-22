@@ -20,7 +20,7 @@ const createRapport = async (req, res) => {
         const stream = cloudinary.uploader.upload_stream(
           {
             folder: "uploads",
-            resource_type: "auto",
+            resource_type: "raw",
             public_id: `${Date.now()}_${file.originalname
               .split(".")[0]
               .slice(0, 30)
