@@ -21,7 +21,7 @@ router.put("/:id", protect, updateRapport)
 router.get("/one/:id", protect, getRapportById)
 
 router.get("/getMyRapport",protect, getUserRapports)
-router.delete("/deleteMyRapport",protect, deleteUserRapport)
+router.delete("/deleteMyRapport/:id",protect, deleteUserRapport)
 router.post("/updateMyRapport",protect, updateUserRapport)
 
 /**
