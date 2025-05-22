@@ -16,7 +16,7 @@ router.post("/register", createUsers);
 
 router.post("/login", loginUser);
 
-router.get("/profile", protect, getUserProfile);
+router.get("/profile",protect, getUserProfile);
 
 router.get("/admin/user/:id", protect, admin, getUserById);
 
