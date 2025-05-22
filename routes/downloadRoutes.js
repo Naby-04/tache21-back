@@ -9,4 +9,5 @@ const { uploadToCloucinary } = require("../middlewares/upload");
 router.get("/:rapportId",protect, controllerDownload)
 
 
-module.exports = router
+module.exports = 
+router
