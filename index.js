@@ -23,7 +23,6 @@ const app = express();
 // ✅ Middleware de base
 app.use(cors({
   origin: "*",
-  // origin: "https://senrapport.netlify.app/",
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
@@ -42,6 +41,7 @@ app.post("/test-upload", upload.single("file"), async (req, res) => {
     return res.status(400).json({ message: "Aucun fichier reçu" });
   }
 })
+
 
 // ✅ Swagger docs
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));

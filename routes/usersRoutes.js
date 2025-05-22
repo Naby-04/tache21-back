@@ -8,8 +8,9 @@ const {createUsers,
         updateUserProfile,
         getAllUsers,
         deleteUser ,
-        logout
+        logout,
     } = require("../controllers/usersControlleurs");
+const { forgetPassword , resetPassword} = require("../controllers/forgetPassword");
 
 router.post("/register", createUsers);
 
@@ -26,7 +27,13 @@ router.get("/allusers", protect ,  getAllUsers);
 router.delete("/:id", protect,  deleteUser);
 
 
-router.post("/logout", logout)
+router.post("/logout", logout),
+
+router.post("/forget-password", forgetPassword)
+
+router.post("/reset-password/:token", resetPassword)
+
+
 
 
 
