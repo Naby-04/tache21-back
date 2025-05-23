@@ -9,7 +9,8 @@ const {createUsers,
         getAllUsers,
         deleteUser ,
         logout,
-        loginWithGoogle
+        loginWithGoogle,
+        registerWithGoogle
     } = require("../controllers/usersControlleurs");
 const { forgetPassword , resetPassword} = require("../controllers/forgetPassword");
 
@@ -37,6 +38,7 @@ router.post("/reset-password/:token", resetPassword)
 
 
 router.post("/google-login", loginWithGoogle);
+router.post("/google-register", registerWithGoogle);
 
 
 module.exports = router
