@@ -208,9 +208,45 @@ const loginWithGoogle = async (req, res) => {
   }
 };
 
-  
+const registerWithGoogle = async (req, res) => {
+  try {
+    const { email, prenom } = req.body;
 
+    if (!email || !prenom) {
+      return res.status(400).json({ message: "Champs requis manquants" });
+    }
 
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "Email déjà utilisé, veuillez vous connecter." });
+    }
+
+    // Crée un utilisateur avec un mot de passe aléatoire (ou vide si non nécessaire)
+    const randomPassword = Math.random().toString(36).slice(-8); // ex : 'x8d3t9zq'
+
+    const newUser = await User.create({
+      prenom,
+      email,
+      password: randomPassword,
+    });
+
+    const token = newUser.generateToken();
+
+    res.status(201).json({
+      message: "Inscription avec Google réussie",
+      user: {
+        id: newUser._id,
+        prenom: newUser.prenom,
+        email: newUser.email,
+        isAdmin: newUser.isAdmin,
+      },
+      token,
+    });
+  } catch (error) {
+    console.error("Erreur Google register:", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
 
  
 module.exports = {
@@ -222,5 +258,6 @@ module.exports = {
      getAllUsers,
      deleteUser,
      logout,
-     loginWithGoogle
+     loginWithGoogle,
+     registerWithGoogle
     }

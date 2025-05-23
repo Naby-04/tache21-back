@@ -9,7 +9,8 @@ const {createUsers,
         getAllUsers,
         deleteUser ,
         logout,
-        loginWithGoogle
+        loginWithGoogle,
+        registerWithGoogle
     } = require("../controllers/usersControlleurs");
 
 router.post("/register", createUsers);
@@ -30,6 +31,7 @@ router.delete("/:id", protect,  deleteUser);
 router.post("/logout", logout)
 
 router.post("/google-login", loginWithGoogle);
+router.post("/google-register", registerWithGoogle);
 
 
 module.exports = router
