@@ -24,6 +24,9 @@ const rapportSchema = new mongoose.Schema({
   tags: {
     type: String,
   },
+  publicId: {
+    type: String,
+  },
 
   type: {
     type: String,

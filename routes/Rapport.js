@@ -10,6 +10,7 @@ const { createRapport,
 
 const upload = require("../middlewares/upload")
 const {protect} = require("../middlewares/authMiddleware")
+
 const router = express.Router()
 
 router.post("/create", protect, upload.single("fileUrl"), createRapport)

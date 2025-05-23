@@ -106,8 +106,10 @@ const deleteRapport = async (req, res) => {
 };
 
 const updateRapport = async (req, res) => {
+
   console.log("Données reçues dans req.body :", req.body);
   console.log("Fichier reçu dans req.file :", req.file);
+
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     return res.status(400).json({ message: "ID invalide" });
   }
