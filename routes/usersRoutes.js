@@ -28,7 +28,13 @@ router.get("/allusers", protect ,  getAllUsers);
 router.delete("/:id", protect,  deleteUser);
 
 
-router.post("/logout", logout)
+router.post("/logout", logout),
+
+router.post("/forget-password", forgetPassword)
+
+router.post("/reset-password/:token", resetPassword)
+
+
 
 router.post("/google-login", loginWithGoogle);
 
