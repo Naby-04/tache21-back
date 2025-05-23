@@ -177,6 +177,37 @@ const deleteUser = async (req, res) => {
       res.status(500).json({ message: "Erreur serveur" });
     }
   };
+
+  // Contrôleur Google login
+const loginWithGoogle = async (req, res) => {
+  const { email, prenom } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(401).json({ message: "Email non reconnu. Veuillez vous inscrire." });
+    }
+
+    // Générer un token JWT
+    const token = user.generateToken();
+
+    res.json({
+      message: "Connexion via Google réussie",
+      user: {
+        id: user._id,
+        prenom: user.prenom,
+        email: user.email,
+        isAdmin: user.isAdmin,
+      },
+      token,
+    });
+  } catch (error) {
+    console.error("Erreur lors de la connexion Google :", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
   
 
 
@@ -190,5 +221,6 @@ module.exports = {
      updateUserProfile,
      getAllUsers,
      deleteUser,
-     logout
+     logout,
+     loginWithGoogle
     }
