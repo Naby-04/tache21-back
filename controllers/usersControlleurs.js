@@ -248,7 +248,6 @@ const registerWithGoogle = async (req, res) => {
   }
 };
 
- 
 module.exports = {
      createUsers ,
      loginUser,
