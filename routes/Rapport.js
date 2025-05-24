@@ -14,7 +14,7 @@ const router = express.Router()
 
 router.post("/create", protect, upload.single("fileUrl"), createRapport)
 router.get("/all", getAllRapports)
-router.post("/create", protect, upload.single("file"), createRapport)
+// router.post("/create", protect, upload.single("file"), createRapport)
 router.get("/all", protect, getAllRapports)
 router.delete("/:id", protect, deleteRapport)
 router.put("/:id", protect, updateRapport)
@@ -22,7 +22,8 @@ router.get("/one/:id", protect, getRapportById)
 
 router.get("/getMyRapport",protect, getUserRapports)
 router.delete("/deleteMyRapport/:id",protect, deleteUserRapport)
-router.post("/updateMyRapport",protect, updateUserRapport)
+router.put("/updateMyRapport/:id", protect, upload.single("file"), updateUserRapport);
+
 
 /**
  * @swagger

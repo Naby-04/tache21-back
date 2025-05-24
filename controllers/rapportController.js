@@ -156,10 +156,34 @@ const updateUserRapport = async (req, res) => {
     return res.status(400).json({ message: "ID invalide" });
   }
 
+  if (!req.user || !req.user.id) {
+    return res.status(401).json({ message: "Non autorisé" });
+  }
+
+  const { title, description } = req.body;
+
+  if (!title || !description) {
+    return res.status(400).json({ message: "Champs requis manquants" });
+  }
+
+  const updateData = {
+    title,
+    description,
+  };
+
+  // ✅ Si un fichier est envoyé, on le traite ici
+  if (req.file) {
+    // Par exemple, si le fichier est stocké localement :
+    updateData.fileUrl = `/uploads/${req.file.filename}`;
+
+    // Ou si tu utilises Cloudinary :
+    // updateData.fileUrl = req.file.path;
+  }
+
   try {
     const rapport = await Rapport.findOneAndUpdate(
       { _id: req.params.id, user: req.user.id },
-      req.body,
+      updateData,
       { new: true }
     );
 
@@ -169,9 +193,12 @@ const updateUserRapport = async (req, res) => {
 
     return res.status(200).json({ msg: "Rapport modifié avec succès", rapport });
   } catch (error) {
+    console.error("Erreur lors de la mise à jour du rapport :", error);
     return res.status(500).json({ message: "Erreur serveur" });
   }
 };
+
+
 
 module.exports = {
   createRapport,
