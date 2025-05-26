@@ -76,4 +76,50 @@ router.delete("/:id", protect, async (req, res) => {
   }
 });
 
+// Nouvelle route pour top rapports
+router.get("/top/commented", async (req, res) => {
+  try {
+    const topRapports = await Comment.aggregate([
+      {
+        $group: {
+          _id: "$rapport",
+          totalComments: { $sum: 1 },
+        },
+      },
+      {
+        $match: {
+          totalComments: { $gt: 5 },
+        },
+      },
+      {
+        $sort: { totalComments: -1 },
+      },
+      {
+        $lookup: {
+          from: "rapports",
+          localField: "_id",
+          foreignField: "_id",
+          as: "rapport",
+        },
+      },
+      {
+        $unwind: "$rapport",
+      },
+      {
+        $project: {
+          _id: 0,
+          rapport: 1,
+          totalComments: 1,
+        },
+      },
+    ]);
+
+    res.status(200).json(topRapports);
+  } catch (error) {
+    console.error("Erreur lors de la récupération des top rapports :", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+
 module.exports = router
