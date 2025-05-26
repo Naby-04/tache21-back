@@ -65,4 +65,23 @@ const controllerDownload = async (req, res) => {
   }
 };
 
-module.exports = { controllerDownload };
+const getDownloads = async (req, res) => {
+  try {
+    const downloads = await Download.find({}).populate("userId").populate("rapportId")
+    res.status(200).json(downloads)
+  } catch (error) {
+    console.log("Erreur serveur :", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+}
+
+const getDownloadsUser = async (req, res) => {
+  try {
+    const download = await Download.find({userId: req.user.id}).populate("rapportId").populate("userId")
+    res.status(200).json(download)
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+}
+
+module.exports = { controllerDownload, getDownloads, getDownloadsUser };
