@@ -85,3 +85,16 @@ const getDownloadsUser = async (req, res) => {
 }
 
 module.exports = { controllerDownload, getDownloads, getDownloadsUser };
+
+
+
+
+// const getDownloadCount = async (req, res) => {
+//   try {
+//     const count = await Download.countDocuments();
+//     res.status(200).json({ totalDownloads: count });
+//   } catch (error) {
+//     console.error("Erreur lors du comptage des téléchargements :", error);
+//     res.status(500).json({ message: "Erreur serveur" });
+//   }
+// };

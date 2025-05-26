@@ -61,3 +61,15 @@ router.get("/all/userRapport" ,protect, getDownloadsUser)
 */
 
 module.exports = router
+
+
+
+// const {controllerDownload, getDownloads, getDownloadsUser, getDownloadCount} = require("../controllers/downloadController");
+
+// // Mettez les routes spécifiques d'abord
+// router.get("/count/all", protect, admin, getDownloadCount);
+// router.get("/all/rapport", protect, admin, getDownloads);
+// router.get("/all/userRapport", protect, getDownloadsUser);
+
+// // Ensuite la route dynamique
+// router.get("/:rapportId", protect, controllerDownload);
