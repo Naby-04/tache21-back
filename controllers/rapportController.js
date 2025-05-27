@@ -24,9 +24,11 @@ const createRapport = async (req, res) => {
         const stream = cloudinary.uploader.upload_stream(
           {
             folder: "uploads",
-            public_id: `${Date.now()}_${file.originalname.split(".")[0].replace(/\s+/g, "_")}`,
+           public_id: `${Date.now()}_${file.originalname.replace(/\s+/g, "_")}`,
             resource_type: mime.includes("pdf") || mime.includes("msword") || mime.includes("officedocument") ? "raw" : "auto",
+            
           },
+         
           (error, result) => {
             if (error) return reject(error);
             resolve(result);
@@ -68,7 +70,7 @@ const getAllRapports = async (req, res) => {
     // const rapports = await Rapport.find({}).sort({ createdAt: -1 });
     const rapports = await Rapport.find({})
       .sort({ createdAt: -1 })
-      .populate('userId', 'prenom');
+      .populate('user', 'prenom');
     return res.status(200).json(rapports);
   } catch (error) {
     return res.status(500).json({ message: "Impossible de récupérer les rapports" });
