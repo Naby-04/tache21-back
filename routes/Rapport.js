@@ -10,7 +10,7 @@ const { createRapport,
 
 const {upload} = require("../middlewares/upload")
 const {protect, admin} = require("../middlewares/authMiddleware")
-const { getDownloads, getDownloadsUser } = require("../controllers/downloadController")
+// const { getDownloads, getDownloadsUser } = require("../controllers/downloadController")
 
 const router = express.Router()
 

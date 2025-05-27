@@ -85,6 +85,30 @@ const getDownloadsUser = async (req, res) => {
 }
 
 module.exports = { controllerDownload, getDownloads, getDownloadsUser };
+// const getMyDownloads = async (req, res) => {
+//   try {
+//     const userId = req.user?._id;
+
+//     // Récupère les téléchargements de l'utilisateur et popule les rapports liés
+//     const downloads = await Download.find({ userId }).populate("rapportId");
+
+//     // Extrait les rapports téléchargés (rapportId contient le document Rapport)
+//     const rapports = downloads.map(dl => ({
+//       _id: dl.rapportId._id,
+//       title: dl.rapportId.title,
+//       description: dl.rapportId.description,
+//       fileUrl: dl.rapportId.fileUrl,
+//       createdAt: dl.rapportId.createdAt,
+//     }));
+
+//     res.status(200).json(rapports);
+//   } catch (err) {
+//     console.error("Erreur lors de la récupération des téléchargements :", err);
+//     res.status(500).json({ message: "Erreur serveur" });
+//   }
+// };
+
+
 
 
 

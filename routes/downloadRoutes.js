@@ -2,8 +2,11 @@ const express = require("express");
 
 const router = express.Router()
 
-const {protect, admin} = require("../middlewares/authMiddleware")
+// const {protect, admin} = require("../middlewares/authMiddleware")
 const {controllerDownload, getDownloads, getDownloadsUser} = require("../controllers/downloadController");
+const {protect} = require("../middlewares/authMiddleware")
+// const {controllerDownload , getMyDownloads} = require("../controllers/downloadController");
+const { uploadToCloucinary } = require("../middlewares/upload");
 
 router.get("/:rapportId",protect, controllerDownload)
 
@@ -73,3 +76,8 @@ module.exports = router
 
 // // Ensuite la route dynamique
 // router.get("/:rapportId", protect, controllerDownload);
+
+
+
+module.exports = 
+router

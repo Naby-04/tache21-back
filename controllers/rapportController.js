@@ -48,7 +48,7 @@ const createRapport = async (req, res) => {
       tags,
       type: file.mimetype,
       date: new Date().toLocaleString(),
-      user: req.user.id,
+      userId: req.user.id,
     });
 
     await newRapport.save();
