@@ -38,14 +38,7 @@ const rapportSchema = new mongoose.Schema({
     required: true,
   },
 
-  createdAt: {
-    type: Date,
-    default: Date.now().toLocaleString(),
-  },
-
-});
-
+}, { timestamps: true });
 
 
 module.exports = mongoose.model("Rapport", rapportSchema);
-
