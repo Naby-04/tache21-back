@@ -10,7 +10,8 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:8080", // à adapter si nécessaire
+        // url: "http://localhost:8080"
+        url: "https://tache21-back.onrender.com"
       },
     ],
   },

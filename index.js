@@ -1,57 +1,58 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const path = require("path");
 const connectDB = require("./config/db.js");
+const {upload} = require("./middlewares/upload.js");
 
 const { errorHandler } = require("./middlewares/errorMiddleware.js");
+
 const usersRoutes = require("./routes/usersRoutes.js");
 const rapportRoutes = require("./routes/Rapport");
-const path = require("path");
+const downloadRoutes = require("./routes/downloadRoutes");
+const commentRoutes = require("./routes/commentRoutes");
 
-
-// swagger module
+// Swagger
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./sawgger");
 
-const commentRoutes = require('./routes/commentRoutes.js')
-
-
 dotenv.config();
+
 const app = express();
 
-// ✅ 1. CORS en premier !
+// ✅ Middleware de base
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
+  credentials: true,
 }));
 
-// ✅ 2. JSON + urlencoded
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ 3. Routes API
+// ✅ Routes
 app.use("/api/users", usersRoutes);
 app.use("/rapport", rapportRoutes);
 app.use("/api/comments", commentRoutes)
+app.use("/download", downloadRoutes)
+
+app.post("/test-upload", upload.single("file"), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "Aucun fichier reçu" });
+  }
+})
 
 
-// ✅ 4. Fichiers statiques : après les routes
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// ✅ Swagger docs
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// ✅ 5. Gestion des erreurs
+// ✅ Gestion d’erreurs
 app.use(errorHandler);
-
-// ✅ 6. Connexion & démarrage serveur
-connectDB().then(() => {
-  app.listen(process.env.PORT, () => {
-    console.log(`✅ Server running on port ${process.env.PORT}`);
-  });
-});
 
 // routesSwagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
+// ✅ 6. Connexion & démarrage serveur
 connectDB()
 .then(() => {
     app.listen(process.env.PORT, () => {

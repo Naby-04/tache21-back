@@ -1,13 +1,5 @@
 const User = require('../model/userModel')
-const crypto = require("crypto");
-// const nodemailer = require('nodemailer');
-const jwt = require("jsonwebtoken");
-const sendEmail = require("../utils/sendEmail.js"); // à créer juste après
 
-// const bcrypt = require("bcryptjs");
-
-
-// creation d'un utilisateur
 const createUsers = async (req, res) => {
     try {
         const { prenom, email, password , isAdmin} = req.body;
@@ -24,6 +16,13 @@ const createUsers = async (req, res) => {
         // generer le token
         const token = user.generateToken();
 
+        res.cookie("token", token, {
+          httpOnly: true,
+          expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          sameSite: "none",
+          secure: true,
+        })
+
         // renvoyer le token
         res.status(201).json({ 
              message: "Utilisateur créé",
@@ -36,6 +35,7 @@ const createUsers = async (req, res) => {
                 token
             });
             console.log("utilisateur créer", user);
+            console.log("id de user", user._id);
             
     } catch (error) {
         console.error("erreur d'inscription", error);
@@ -46,6 +46,7 @@ const createUsers = async (req, res) => {
 const loginUser = async (req, res) => {
     try {
       const { email, password } = req.body;
+      console.log("email et password", email, password);
    
       // Chercher l'utilisateur
       const user = await User.findOne({ email });
@@ -75,6 +76,11 @@ const loginUser = async (req, res) => {
       res.status(500).json({ message: "Erreur serveur" });
     }
   };
+
+  const logout = async (req, res) => {
+    res.clearCookie("token");
+    res.status(200).json({ message: "Deconnexion avec success" });
+  }
   
 //GET users
 const getUserProfile = async (req, res) => {
@@ -144,7 +150,7 @@ const getUserById = async (req, res) => {
 const getAllUsers = async (req, res) => {
     try {
       const users = await User.find().select("-password"); // sans les mots de passe
-      res.json(users);
+      res.status(200).json(users);
     } catch (error) {
       console.error("Erreur récupération des utilisateurs :", error);
       res.status(500).json({ message: "Erreur serveur" });
@@ -160,97 +166,82 @@ const deleteUser = async (req, res) => {
       if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
   
       await user.deleteOne();
-      res.json({ message: "Utilisateur supprimé avec succès" });
+      res.status(200).json({ message: "Utilisateur supprimé avec succès" });
     } catch (error) {
       console.error("Erreur suppression utilisateur :", error);
       res.status(500).json({ message: "Erreur serveur" });
     }
   };
-  
 
-  // Mot de passe oublier
-const forgotPassword = async (req, res) => {
+  // Contrôleur Google login
+const loginWithGoogle = async (req, res) => {
+  const { email, prenom } = req.body;
+
   try {
-    const { email } = req.body;
-
     const user = await User.findOne({ email });
+
     if (!user) {
-      return res.status(404).json({ status: "Aucun utilisateur trouvé avec cet email" });
+      return res.status(401).json({ message: "Email non reconnu. Veuillez vous inscrire." });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "15m" });
+    // Générer un token JWT
+    const token = user.generateToken();
 
-    const resetUrl = `http://localhost:5173/reset-password/${user._id}/${token}`;
-    const message = `Cliquez sur ce lien pour réinitialiser votre mot de passe : ${resetUrl}`;
-
-    await sendEmail(email, "Réinitialisation de mot de passe", message);
-
-    res.json({ status: "Succès", message: "Email de réinitialisation envoyé" });
-
-  } catch (error) {
-    console.error("Erreur dans forgotPassword :", error);
-    res.status(500).json({ status: "Erreur serveur" });
-  }
-};
-
-module.exports = forgotPassword;
-
-
-
-    // Générer un token sécurisé
-  //   const resetToken = crypto.randomBytes(32).toString("hex");
-  //   const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
-
-  //   // Stocker dans le user
-  //   user.resetPasswordToken = hashedToken;
-  //   user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
-
-  //   await user.save();
-
-  //   // URL de réinitialisation (à ajuster selon ton frontend)
-  //   const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
-  //   const message = `Cliquez sur ce lien pour réinitialiser votre mot de passe : ${resetUrl}`;
-
-  //   await sendEmail(user.email, "Réinitialisation de mot de passe", message);
-
-  //   res.json({ message: "Email de réinitialisation envoyé" });
-  // } catch (error) {
-  //   console.error("Erreur forgotPassword :", error);
-  //   res.status(500).json({ message: "Erreur serveur" });
-  // }
-
-
-
-// reset password
-const resetPassword = async (req, res) => {
-  try {
-    const { password } = req.body;
-    const hashedToken = crypto.createHash("sha256").update(req.params.token).digest("hex");
-
-    const user = await User.findOne({
-      resetPasswordToken: hashedToken,
-      resetPasswordExpire: { $gt: Date.now() },
+    res.json({
+      message: "Connexion via Google réussie",
+      user: {
+        id: user._id,
+        prenom: user.prenom,
+        email: user.email,
+        isAdmin: user.isAdmin,
+      },
+      token,
     });
-
-    if (!user) {
-      return res.status(400).json({ message: "Token invalide ou expiré" });
-    }
-
-    user.password = password;
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undefined;
-
-    await user.save();
-
-    res.json({ message: "Mot de passe réinitialisé avec succès" });
   } catch (error) {
-    console.error("Erreur resetPassword :", error);
+    console.error("Erreur lors de la connexion Google :", error);
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
+const registerWithGoogle = async (req, res) => {
+  try {
+    const { email, prenom } = req.body;
 
+    if (!email || !prenom) {
+      return res.status(400).json({ message: "Champs requis manquants" });
+    }
 
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "Email déjà utilisé, veuillez vous connecter." });
+    }
+
+    // Crée un utilisateur avec un mot de passe aléatoire (ou vide si non nécessaire)
+    const randomPassword = Math.random().toString(36).slice(-8); // ex : 'x8d3t9zq'
+
+    const newUser = await User.create({
+      prenom,
+      email,
+      password: randomPassword,
+    });
+
+    const token = newUser.generateToken();
+
+    res.status(201).json({
+      message: "Inscription avec Google réussie",
+      user: {
+        id: newUser._id,
+        prenom: newUser.prenom,
+        email: newUser.email,
+        isAdmin: newUser.isAdmin,
+      },
+      token,
+    });
+  } catch (error) {
+    console.error("Erreur Google register:", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
 
 module.exports = {
      createUsers ,
@@ -260,6 +251,7 @@ module.exports = {
      updateUserProfile,
      getAllUsers,
      deleteUser,
-     forgotPassword,
-     resetPassword
+     logout,
+     loginWithGoogle,
+     registerWithGoogle
     }

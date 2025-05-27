@@ -8,28 +8,37 @@ const {createUsers,
         updateUserProfile,
         getAllUsers,
         deleteUser ,
-        forgotPassword,
-        resetPassword
+        logout,
+        loginWithGoogle,
+        registerWithGoogle
     } = require("../controllers/usersControlleurs");
+const { forgetPassword , resetPassword} = require("../controllers/forgetPassword");
 
 router.post("/register", createUsers);
 
 router.post("/login", loginUser);
 
-router.get("/profile", protect, getUserProfile);
+router.get("/profile",protect, getUserProfile);
 
 router.get("/admin/user/:id", protect, admin, getUserById);
 
 router.put("/update", protect, updateUserProfile); 
 
-router.get("/allusers", protect, admin ,  getAllUsers);
+router.get("/allusers", protect ,  getAllUsers);
 
-router.delete("/:id", protect, admin , deleteUser);
+router.delete("/:id", protect,  deleteUser);
 
-router.post("/forgot-password", forgotPassword);
+
+router.post("/logout", logout),
+
+router.post("/forget-password", forgetPassword)
+
 router.post("/reset-password/:token", resetPassword)
 
 
+
+router.post("/google-login", loginWithGoogle);
+router.post("/google-register", registerWithGoogle);
 
 
 module.exports = router
