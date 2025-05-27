@@ -24,9 +24,11 @@ const createRapport = async (req, res) => {
         const stream = cloudinary.uploader.upload_stream(
           {
             folder: "uploads",
-            public_id: `${Date.now()}_${file.originalname.split(".")[0].replace(/\s+/g, "_")}`,
+           public_id: `${Date.now()}_${file.originalname.replace(/\s+/g, "_")}`,
             resource_type: mime.includes("pdf") || mime.includes("msword") || mime.includes("officedocument") ? "raw" : "auto",
+            
           },
+         
           (error, result) => {
             if (error) return reject(error);
             resolve(result);
@@ -70,8 +72,8 @@ const getAllRapports = async (req, res) => {
     //   .sort({ createdAt: -1 })
     //   .populate('userId', 'prenom');
     const rapports = await Rapport.find({})
-  .sort({ createdAt: -1 })
-  .populate('user', 'prenom'); // ✅ bon champ
+      .sort({ createdAt: -1 })
+      .populate('user', 'prenom');
     return res.status(200).json(rapports);
   } catch (error) {
     return res.status(500).json({ message: "Impossible de récupérer les rapports" });
@@ -164,10 +166,34 @@ const updateUserRapport = async (req, res) => {
     return res.status(400).json({ message: "ID invalide" });
   }
 
+  if (!req.user || !req.user.id) {
+    return res.status(401).json({ message: "Non autorisé" });
+  }
+
+  const { title, description } = req.body;
+
+  if (!title || !description) {
+    return res.status(400).json({ message: "Champs requis manquants" });
+  }
+
+  const updateData = {
+    title,
+    description,
+  };
+
+  // ✅ Si un fichier est envoyé, on le traite ici
+  if (req.file) {
+    // Par exemple, si le fichier est stocké localement :
+    updateData.fileUrl = `/uploads/${req.file.filename}`;
+
+    // Ou si tu utilises Cloudinary :
+    // updateData.fileUrl = req.file.path;
+  }
+
   try {
     const rapport = await Rapport.findOneAndUpdate(
       { _id: req.params.id, user: req.user.id },
-      req.body,
+      updateData,
       { new: true }
     );
 
@@ -177,9 +203,12 @@ const updateUserRapport = async (req, res) => {
 
     return res.status(200).json({ msg: "Rapport modifié avec succès", rapport });
   } catch (error) {
+    console.error("Erreur lors de la mise à jour du rapport :", error);
     return res.status(500).json({ message: "Erreur serveur" });
   }
 };
+
+
 
 module.exports = {
   createRapport,
