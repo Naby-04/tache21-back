@@ -27,7 +27,7 @@ const UserSchema = new mongoose.Schema(
     },
     photo: {
       type: String,
-      default: "https://i.pinimg.com/736x/3c/ae/07/3cae079ca0b9e55ec6bfc1b358c9b1e2.jpg", // Tu peux aussi mettre une URL par défaut ici
+      default: "https://res.cloudinary.com/dddxx1rtc/image/upload/v1747827864/3cae079ca0b9e55ec6bfc1b358c9b1e2_l1xuma.jpg",
     },
      
     resetPasswordToken: { 
