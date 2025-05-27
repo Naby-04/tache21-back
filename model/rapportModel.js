@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { v4: uuidv4 } = require("uuid");
 
 const rapportSchema = new mongoose.Schema({
   title: {
@@ -23,6 +22,9 @@ const rapportSchema = new mongoose.Schema({
   },
 
   tags: {
+    type: String,
+  },
+  publicId: {
     type: String,
   },
 

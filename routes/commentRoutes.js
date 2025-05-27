@@ -1,3 +1,4 @@
+const mongoose = require('mongoose')
 const express = require('express')
 const router = express.Router()
 const Comment = require("../model/commentsModel")
@@ -74,8 +75,5 @@ router.delete("/:id", protect, async (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 });
-
-
-
 
 module.exports = router

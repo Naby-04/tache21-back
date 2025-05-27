@@ -21,19 +21,18 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+   
     isAdmin: {
       type: Boolean,
       default: false,
     },
-    // 📸 Photo de profil avec une image par défaut hébergée sur Cloudinary
-    profileImage: {
-      type: String,
-      default:
-        "https://res.cloudinary.com/dcidine0f/image/upload/c_auto,g_auto,h_500,w_500/v1747757957/uploads/userProfil.JPG",
-    },
-    // 🔐 Pour réinitialiser le mot de passe
-    resetPasswordToken: String,
-    resetPasswordExpire: Date,
+     
+    resetPasswordToken: { 
+      type: String
+     },
+  resetPasswordExpires: {
+     type: Date
+     },
   },
   { timestamps: true } // Crée createdAt et updatedAt automatiquement
 );
@@ -46,6 +45,10 @@ UserSchema.methods.generateToken = function () {
     { expiresIn: "90d" } // Expire après 90 jours
   );
 };
+// refresh
+
+console.log("address email" , process.env.JWT_SECRET);
+
 
 // 🔍 Vérifie que le mot de passe entré correspond au mot de passe haché
 UserSchema.methods.matchPassword = async function (enteredPassword) {

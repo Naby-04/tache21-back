@@ -3,27 +3,29 @@ const Rapport = require("../model/rapportModel");
 const streamifier = require("streamifier")
 const cloudinary = require("../cloudinary")
 
+
+
+
 const createRapport = async (req, res) => {
-    const {title, description, category, tags} = req.body
-    const file = req.file //on recupere le nom depuis le middleware update
+  const { title, description, category, tags } = req.body;
+  const file = req.file;
 
-    if(!title || !description || !file || !category){
-        return res.status(400).json({message: "Veuillez renseigner ces champs"})
-    }
-    
+  if (!title || !description || !file || !category) {
+    return res.status(400).json({ message: "Veuillez renseigner tous les champs requis." });
+  }
 
-    try {
+  try {
+    // On récupère le type MIME du fichier
+    const mime = file.mimetype;
 
-      
-         const streamUpload = (fileBuffer) => {
+    // Fonction pour envoyer le fichier à Cloudinary
+    const streamUpload = (fileBuffer) => {
       return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
           {
             folder: "uploads",
-            resource_type: "auto",
-            public_id: `${Date.now()}_${file.originalname
-              .split(".")[0]
-              .replace(/\s+/g, "_")}`,
+            public_id: `${Date.now()}_${file.originalname.split(".")[0].replace(/\s+/g, "_")}`,
+            resource_type: mime.includes("pdf") || mime.includes("msword") || mime.includes("officedocument") ? "raw" : "auto",
           },
           (error, result) => {
             if (error) return reject(error);
@@ -34,36 +36,39 @@ const createRapport = async (req, res) => {
       });
     };
 
+    // Envoie du fichier à Cloudinary
     const result = await streamUpload(file.buffer);
 
-        // const fileUrl = file.path // on recupere la forme de donnee qu'on veut recuperer sois par extension ou par le nom ex: par le nom file.filename
-        const newRapport = new Rapport({
-        title,
-        description,
-        fileUrl:result.secure_url,
-        category,
-        tags,
-        type: file.mimetype,
-        date: Date.now().toLocaleString(),
+    // Création du nouveau rapport
+    const newRapport = new Rapport({
+      title,
+      description,
+      fileUrl: result.secure_url,
+      category,
+      tags,
+      type: file.mimetype,
+      date: new Date().toLocaleString(),
+      user: req.user.id,
+    });
 
-        user: req.user.id
-    })
+    await newRapport.save();
 
-    console.log("fileName",newRapport.type);
-    
-    await newRapport.save()
+    return res.status(201).json({ message: "Rapport créé avec succès", rapport: newRapport });
+  } catch (error) {
+    console.error("Erreur dans /createRapport :", error);
+    return res.status(500).json({ message: "Une erreur s'est produite lors de la création du rapport." });
+  }
+};
 
-    return res.status(201).json({message: "Rapport crée", rapport:newRapport})
-    }
-    catch (error) {
-       console.error("Erreur dans /create:", error); // ➤ pour voir le vrai message
-    res.status(500).json({ message: "Une erreur s'est produite" });
-    }
-}
+
+
 
 const getAllRapports = async (req, res) => {
   try {
-    const rapports = await Rapport.find({}).sort({ createdAt: -1 });
+    // const rapports = await Rapport.find({}).sort({ createdAt: -1 });
+    const rapports = await Rapport.find({})
+      .sort({ createdAt: -1 })
+      .populate('userId', 'prenom');
     return res.status(200).json(rapports);
   } catch (error) {
     return res.status(500).json({ message: "Impossible de récupérer les rapports" });
@@ -101,8 +106,10 @@ const deleteRapport = async (req, res) => {
 };
 
 const updateRapport = async (req, res) => {
+
   console.log("Données reçues dans req.body :", req.body);
   console.log("Fichier reçu dans req.file :", req.file);
+
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     return res.status(400).json({ message: "ID invalide" });
   }
