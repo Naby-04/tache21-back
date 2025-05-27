@@ -24,11 +24,9 @@ const createRapport = async (req, res) => {
         const stream = cloudinary.uploader.upload_stream(
           {
             folder: "uploads",
-           public_id: `${Date.now()}_${file.originalname.replace(/\s+/g, "_")}`,
-            resource_type: mime.includes("pdf") || mime.includes("msword") || mime.includes("officedocument") ? "raw" : "auto",
-            
+            public_id: `${Date.now()}_${file.originalname.split(".")[0].replace(/\s+/g, "_")}`,
+            resource_type: "raw",
           },
-         
           (error, result) => {
             if (error) return reject(error);
             resolve(result);
