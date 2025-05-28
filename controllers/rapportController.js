@@ -4,8 +4,6 @@ const streamifier = require("streamifier")
 const cloudinary = require("../cloudinary")
 
 
-
-
 const createRapport = async (req, res) => {
   const { title, description, category, tags } = req.body;
   const file = req.file;
@@ -22,18 +20,28 @@ const createRapport = async (req, res) => {
     const streamUpload = (fileBuffer) => {
       return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
-          {
-            folder: "uploads",
-           public_id: `${Date.now()}_${file.originalname.replace(/\s+/g, "_")}`,
-            resource_type: mime.includes("pdf") || mime.includes("msword") || mime.includes("officedocument") ? "raw" : "auto",
-            
-          },
-         
-          (error, result) => {
-            if (error) return reject(error);
-            resolve(result);
-          }
-        );
+            {
+              folder: "uploads",
+              public_id: `${Date.now()}_${file.originalname.split(".")[0].replace(/\s+/g, "_")}`,
+              resource_type: "raw",
+              type: "upload" // ✅ Ceci rend le fichier public
+            },
+            (error, result) => {
+              if (error) return reject(error);
+              resolve(result);
+            }
+          );
+        // const stream = cloudinary.uploader.upload_stream(
+        //   {
+        //     folder: "uploads",
+        //     public_id: `${Date.now()}_${file.originalname.split(".")[0].replace(/\s+/g, "_")}`,
+        //     resource_type: mime.includes("pdf") || mime.includes("msword") || mime.includes("officedocument") ? "raw" : "auto",
+        //   },
+        //   (error, result) => {
+        //     if (error) return reject(error);
+        //     resolve(result);
+        //   }
+        // );
         streamifier.createReadStream(fileBuffer).pipe(stream);
       });
     };
@@ -72,8 +80,8 @@ const getAllRapports = async (req, res) => {
     //   .sort({ createdAt: -1 })
     //   .populate('userId', 'prenom');
     const rapports = await Rapport.find({})
-      .sort({ createdAt: -1 })
-      .populate('userId', 'prenom');
+  .sort({ createdAt: -1 })
+  .populate('userId', 'prenom'); // ✅ bon champ
     return res.status(200).json(rapports);
   } catch (error) {
     return res.status(500).json({ message: "Impossible de récupérer les rapports" });
@@ -142,7 +150,7 @@ const updateRapport = async (req, res) => {
 
 const getUserRapports = async (req, res) => {
   try {
-    const rapports = await Rapport.find({ user: req.user.id }).sort({ createdAt: -1 });
+    const rapports = await Rapport.find({ userId: req.user.id }).sort({ createdAt: -1 });
     return res.status(200).json(rapports);
   } catch (error) {
     return res.status(500).json({ message: "Impossible de récupérer les rapports de l'utilisateur" });
@@ -151,7 +159,7 @@ const getUserRapports = async (req, res) => {
 
 const deleteUserRapport = async (req, res) => {
   try {
-    const rapport = await Rapport.findOneAndDelete({ _id: req.params.id, user: req.user.id });
+    const rapport = await Rapport.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
     if (!rapport) {
       return res.status(404).json({ msg: "Rapport introuvable" });
     }
@@ -166,34 +174,10 @@ const updateUserRapport = async (req, res) => {
     return res.status(400).json({ message: "ID invalide" });
   }
 
-  if (!req.user || !req.user.id) {
-    return res.status(401).json({ message: "Non autorisé" });
-  }
-
-  const { title, description } = req.body;
-
-  if (!title || !description) {
-    return res.status(400).json({ message: "Champs requis manquants" });
-  }
-
-  const updateData = {
-    title,
-    description,
-  };
-
-  // ✅ Si un fichier est envoyé, on le traite ici
-  if (req.file) {
-    // Par exemple, si le fichier est stocké localement :
-    updateData.fileUrl = `/uploads/${req.file.filename}`;
-
-    // Ou si tu utilises Cloudinary :
-    // updateData.fileUrl = req.file.path;
-  }
-
   try {
     const rapport = await Rapport.findOneAndUpdate(
-      { _id: req.params.id, user: req.user.id },
-      updateData,
+      { _id: req.params.id, userId: req.user.id },
+      req.body,
       { new: true }
     );
 
@@ -203,12 +187,9 @@ const updateUserRapport = async (req, res) => {
 
     return res.status(200).json({ msg: "Rapport modifié avec succès", rapport });
   } catch (error) {
-    console.error("Erreur lors de la mise à jour du rapport :", error);
     return res.status(500).json({ message: "Erreur serveur" });
   }
 };
-
-
 
 module.exports = {
   createRapport,
