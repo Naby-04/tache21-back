@@ -38,6 +38,7 @@ const controllerDownload = async (req, res) => {
   }
 };
 
+
 const getDownloads = async (req, res) => {
   try {
     const downloads = await Download.find({}).populate("userId").populate("rapportId")
