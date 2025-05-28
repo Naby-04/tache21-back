@@ -115,10 +115,16 @@ const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
+    console.log(user);
+    
 
     // Mise à jour uniquement du prénom et du mot de passe
     if (req.body.prenom) {
       user.prenom = req.body.prenom;
+    }
+
+    if (req.body.photo) {
+      user.photo = req.body.photo;
     }
 
     if (req.body.password) {
@@ -134,6 +140,7 @@ const getUserById = async (req, res) => {
         id: updatedUser._id,
         prenom: updatedUser.prenom,
         email: updatedUser.email, // affichage, mais non modifiable
+        photo: updatedUser.photo,
         isAdmin: updatedUser.isAdmin,
       },
       token,

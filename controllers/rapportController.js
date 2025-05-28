@@ -48,7 +48,7 @@ const createRapport = async (req, res) => {
       tags,
       type: file.mimetype,
       date: new Date().toLocaleString(),
-      user: req.user.id,
+      userId: req.user.id,
     });
 
     await newRapport.save();
@@ -66,9 +66,12 @@ const createRapport = async (req, res) => {
 const getAllRapports = async (req, res) => {
   try {
     // const rapports = await Rapport.find({}).sort({ createdAt: -1 });
+    // const rapports = await Rapport.find({})
+    //   .sort({ createdAt: -1 })
+    //   .populate('userId', 'prenom');
     const rapports = await Rapport.find({})
-      .sort({ createdAt: -1 })
-      .populate('user', 'prenom');
+  .sort({ createdAt: -1 })
+  .populate('userId', 'prenom'); // ✅ bon champ
     return res.status(200).json(rapports);
   } catch (error) {
     return res.status(500).json({ message: "Impossible de récupérer les rapports" });
@@ -137,7 +140,7 @@ const updateRapport = async (req, res) => {
 
 const getUserRapports = async (req, res) => {
   try {
-    const rapports = await Rapport.find({ user: req.user.id }).sort({ createdAt: -1 });
+    const rapports = await Rapport.find({ userId: req.user.id }).sort({ createdAt: -1 });
     return res.status(200).json(rapports);
   } catch (error) {
     return res.status(500).json({ message: "Impossible de récupérer les rapports de l'utilisateur" });
