@@ -181,8 +181,7 @@ const updateUserRapport = async (req, res) => {
     // Par exemple, si le fichier est stocké localement :
     updateData.fileUrl = `/uploads/${req.file.filename}`;
 
-    // Ou si tu utilises Cloudinary :
-    // updateData.fileUrl = req.file.path;
+   
   }
 
   try {
