@@ -69,7 +69,7 @@ const forgetPassword = async (req, res) => {
 
     const { error } = await resend.emails.send({
       from: "SenRapport <hello@sunueducation.com>",
-      to: ["planimportant@gmail.com"],
+      to: [email],
       subject: "Réinitialisation de mot de passe - SenRapport",
       html: verificationHtml({ name: user.prenom, url: resetLink }),
     });

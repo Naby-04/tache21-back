@@ -32,13 +32,14 @@ const rapportSchema = new mongoose.Schema({
     type: String,
   },
 
-  user: {
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
 
 }, { timestamps: true });
+
 
 
 module.exports = mongoose.model("Rapport", rapportSchema);
