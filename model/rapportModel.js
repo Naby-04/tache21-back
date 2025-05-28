@@ -32,7 +32,7 @@ const rapportSchema = new mongoose.Schema({
     type: String,
   },
 
-  user: {
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
@@ -41,6 +41,4 @@ const rapportSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 
-
-module.exports = mongoose.model("Rapport", rapportSchema);
-
+module.exports = mongoose.model("Rapport", rapportSchema)

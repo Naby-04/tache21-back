@@ -7,5 +7,5 @@ const verificationHtml = (props) => {
 };
 
 module.exports = {
-  verificationHtml
-}
+  verificationHtml,
+};
