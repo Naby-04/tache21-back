@@ -10,14 +10,16 @@ const createRapport = async (req, res) => {
   const { title, description, category, tags } = req.body;
   const file = req.file;
 
+  console.log("req.body", req.body);
+  
   if (!title || !description || !file || !category) {
     return res.status(400).json({ message: "Veuillez renseigner tous les champs requis." });
   }
 
   try {
-    // On récupère le type MIME du fichier
-    const mime = file.mimetype;
-
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
     // Fonction pour envoyer le fichier à Cloudinary
     const streamUpload = (fileBuffer) => {
       return new Promise((resolve, reject) => {
@@ -43,11 +45,11 @@ const createRapport = async (req, res) => {
     const newRapport = new Rapport({
       title,
       description,
-      fileUrl: result.secure_url,
+      file: result.secure_url,
       category,
       tags,
       type: file.mimetype,
-      date: new Date().toLocaleString(),
+      date: new Date(),
       userId: req.user.id,
     });
 
@@ -65,10 +67,7 @@ const createRapport = async (req, res) => {
 
 const getAllRapports = async (req, res) => {
   try {
-    // const rapports = await Rapport.find({}).sort({ createdAt: -1 });
-    // const rapports = await Rapport.find({})
-    //   .sort({ createdAt: -1 })
-    //   .populate('userId', 'prenom');
+  
     const rapports = await Rapport.find({})
   .sort({ createdAt: -1 })
   .populate('userId', 'prenom'); // ✅ bon champ
