@@ -121,6 +121,9 @@ const getUserById = async (req, res) => {
       user.prenom = req.body.prenom;
     }
 
+    if (req.body.photo) {
+      user.photo = req.body.photo;
+    }
     if (req.body.password) {
       user.password = req.body.password;
     }
@@ -128,14 +131,18 @@ const getUserById = async (req, res) => {
     const updatedUser = await user.save();
     const token = updatedUser.generateToken();
 
+    console.log("✅ Données utilisateur mises à jour :", updatedUser);
+
+
     res.json({
       message: "Profil mis à jour",
       user: {
-        id: updatedUser._id,
-        prenom: updatedUser.prenom,
-        email: updatedUser.email, // affichage, mais non modifiable
-        isAdmin: updatedUser.isAdmin,
-      },
+    id: userResponse._id,
+    prenom: userResponse.prenom,
+    email: userResponse.email,
+    photo: userResponse.photo,
+    isAdmin: userResponse.isAdmin,
+  },
       token,
     });
   } catch (error) {
