@@ -140,6 +140,8 @@ const updateRapport = async (req, res) => {
 const getUserRapports = async (req, res) => {
   try {
     const rapports = await Rapport.find({ userId: req.user.id }).sort({ createdAt: -1 });
+    // console.log("Rapports de l'utilisateur :", rapports);
+    
     return res.status(200).json(rapports);
   } catch (error) {
     return res.status(500).json({ message: "Impossible de récupérer les rapports de l'utilisateur" });
@@ -148,7 +150,8 @@ const getUserRapports = async (req, res) => {
 
 const deleteUserRapport = async (req, res) => {
   try {
-    const rapport = await Rapport.findOneAndDelete({ _id: req.params.id, user: req.user.id });
+    const rapport = await Rapport.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
+    
     if (!rapport) {
       return res.status(404).json({ msg: "Rapport introuvable" });
     }
@@ -178,17 +181,13 @@ const updateUserRapport = async (req, res) => {
     description,
   };
 
-  // ✅ Si un fichier est envoyé, on le traite ici
   if (req.file) {
-    // Par exemple, si le fichier est stocké localement :
     updateData.fileUrl = `/uploads/${req.file.filename}`;
-
-   
   }
 
   try {
     const rapport = await Rapport.findOneAndUpdate(
-      { _id: req.params.id, user: req.user.id },
+      { _id: req.params.id, userId: req.user.id },
       updateData,
       { new: true }
     );
