@@ -11,7 +11,7 @@ const rapportSchema = new mongoose.Schema({
     required: true,
   },
 
-  fileUrl: {
+  file: {
     type: String,
     required: true,
   },
