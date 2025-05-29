@@ -20,7 +20,7 @@ const controllerDownload = async (req, res) => {
     }
 
     // Vérifie que le fichier existe
-    if (!rapport.fileUrl || !rapport.fileUrl.startsWith("http")) {
+    if (!rapport.file || !rapport.file.startsWith("http")) {
       return res.status(400).json({ message: "URL de fichier invalide" });
     }
     // Enregistre le téléchargement dans la base de données
@@ -29,7 +29,7 @@ const controllerDownload = async (req, res) => {
       userId,
     });
 
-    return res.redirect(rapport.fileUrl);
+    return res.redirect(rapport.file);
 
 
   } catch (error) {
@@ -51,7 +51,15 @@ const getDownloads = async (req, res) => {
 
 const getDownloadsUser = async (req, res) => {
   try {
-    const download = await Download.find({userId: req.user.id}).populate("rapportId").populate("userId")
+    const download = await Download.find({userId: req.user.id})
+    .populate({
+      path: "rapportId",
+      populate: {
+        path: "userId", 
+        select: "prenom nom email",
+      },
+    })
+    .populate("userId")
     res.status(200).json(download)
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur" });

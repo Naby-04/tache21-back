@@ -65,7 +65,10 @@ const createRapport = async (req, res) => {
 
     await newRapport.save();
 
-    return res.status(201).json({ message: "Rapport créé avec succès", rapport: newRapport });
+    // 🟢 Population de l'utilisateur AVANT de retourner le rapport
+    const rapportAvecUser = await Rapport.findById(newRapport._id).populate('userId', 'prenom photo');
+
+    return res.status(201).json({ message: "Rapport créé avec succès", rapport: rapportAvecUser });
   } catch (error) {
     console.error("Erreur dans /createRapport :", error);
     return res.status(500).json({ message: "Une erreur s'est produite lors de la création du rapport." });
@@ -80,7 +83,7 @@ const getAllRapports = async (req, res) => {
   
     const rapports = await Rapport.find({})
   .sort({ createdAt: -1 })
-  .populate('userId', 'prenom photo'); // ✅ bon champ
+  .populate('userId', 'prenom photo'); 
     return res.status(200).json(rapports);
   } catch (error) {
     return res.status(500).json({ message: "Impossible de récupérer les rapports" });
