@@ -67,7 +67,42 @@ const getDownloadsUser = async (req, res) => {
   }
 }
 
-module.exports = { controllerDownload, getDownloads, getDownloadsUser };
+// controllers/downloadController.js
+
+
+const deleteDownload = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id; // Assure-toi que ton middleware d'auth ajoute req.user
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "ID invalide" });
+    }
+
+    const download = await Download.findById(id);
+
+    if (!download) {
+      return res.status(404).json({ message: "Téléchargement introuvable" });
+    }
+
+    // Optionnel : s'assurer que l'utilisateur est bien le propriétaire
+    if (download.userId.toString() !== userId.toString()) {
+      return res.status(403).json({ message: "Non autorisé" });
+    }
+
+    await Download.findByIdAndDelete(id);
+
+    res.status(200).json({ message: "Téléchargement supprimé avec succès" });
+  } catch (error) {
+    console.error("Erreur suppression téléchargement :", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
+
+
+
+module.exports = { controllerDownload, getDownloads, getDownloadsUser , deleteDownload};
 // const getMyDownloads = async (req, res) => {
 //   try {
 //     const userId = req.user?._id;
