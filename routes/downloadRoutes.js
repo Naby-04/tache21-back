@@ -3,13 +3,20 @@ const express = require("express");
 const router = express.Router()
 
 // const {protect, admin} = require("../middlewares/authMiddleware")
-const {controllerDownload, getDownloads, getDownloadsUser} = require("../controllers/downloadController");
+const {controllerDownload, getDownloads, getDownloadsUser , deleteDownload} = require("../controllers/downloadController");
 const {protect} = require("../middlewares/authMiddleware")
 // const {controllerDownload , getMyDownloads} = require("../controllers/downloadController");
 const { uploadToCloucinary } = require("../middlewares/upload");
 
 router.get("/:rapportId",protect, controllerDownload)
 
+<<<<<<< HEAD
+=======
+// Recuperation des downloads
+router.get("/all/rapport", getDownloads)
+router.get("/all/userRapport" ,protect, getDownloadsUser)
+router.delete("/:id", protect, deleteDownload);
+>>>>>>> 8e0a313cc0faf6c5f091ce2955a58dffc602aa73
 
 
 // Commentaires swagger
