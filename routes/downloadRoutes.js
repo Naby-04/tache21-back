@@ -11,6 +11,9 @@ const { uploadToCloucinary } = require("../middlewares/upload");
 router.get("/:rapportId",protect, controllerDownload)
 router.get("/all/rapport", getDownloads);
 router.get("/all/userRapport", protect, getDownloadsUser);
+// Ex: routes/downloadRoutes.js
+router.delete('/:id', protect, deleteDownload);
+
 
 // Commentaires swagger
 /**
