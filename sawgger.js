@@ -10,8 +10,8 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:8000",
-        // url: "https://tache21-back.onrender.com"
+        // url: "http://localhost:8000",
+        url: "https://tache21-back.onrender.com"
       },
     ],
     components: {
