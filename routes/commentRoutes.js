@@ -26,15 +26,21 @@ router.post("/:rapportId", protect, async (req, res) => {
       rapport: rapportId,
     });
 
+    const io = req.app.get("io");
+
     // ✅ Créer une notification pour le propriétaire du rapport
     if (rapport.userId.toString() !== req.user._id.toString()) {
-      await Notification.create({
-        recepteur: rapport.userId,         // propriétaire du rapport
-        messager: req.user._id,          // celui qui commente
-        rapport: rapportId,
-        comment: comment,
-      });
-    }
+  const newNotification = await Notification.create({
+    recepteur: rapport.userId,       // propriétaire du rapport
+    messager: req.user._id,          // celui qui commente
+    rapport: rapportId,
+    comment: comment,
+  });
+
+  io.to(rapport.userId.toString()).emit("newNotification", newNotification);
+}
+
+
 
     res.status(201).json(newComment);
   } catch (error) {
