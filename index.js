@@ -2,6 +2,8 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const path = require("path");
+const { Server } = require("socket.io")
+const http = require("http")
 const connectDB = require("./config/db.js");
 const {upload} = require("./middlewares/upload.js");
 
@@ -19,6 +21,8 @@ const swaggerSpec = require("./sawgger");
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app)
+
 
 // ✅ Middleware de base
 app.use(cors({
@@ -26,6 +30,23 @@ app.use(cors({
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }));
+
+// initialisation de io socket
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"]
+  }
+})
+
+// on declare l'etat connection et la notif a envoyer
+io.on("connection", (socket) => {
+  socket.on("connect", (msg) => {
+    io.emit("connect", msg)
+  })
+})
+
+app.set("io", io)
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

@@ -9,12 +9,14 @@ const cloudinary = require("../cloudinary")
 const createRapport = async (req, res) => {
   const { title, description, category, tags } = req.body;
   const file = req.file;
+  const io = req.app.get("io")
 
   if (!title || !description || !file || !category) {
     return res.status(400).json({ message: "Veuillez renseigner tous les champs requis." });
   }
 
   try {
+    
     // On récupère le type MIME du fichier
     const mime = file.mimetype;
 
@@ -39,6 +41,8 @@ const createRapport = async (req, res) => {
     // Envoie du fichier à Cloudinary
     const result = await streamUpload(file.buffer);
 
+  
+
     // Création du nouveau rapport
     const newRapport = new Rapport({
       title,
@@ -52,6 +56,8 @@ const createRapport = async (req, res) => {
     });
 
     await newRapport.save();
+
+      io.emit("newRapport", newRapport)
 
     return res.status(201).json({ message: "Rapport créé avec succès", rapport: newRapport });
   } catch (error) {

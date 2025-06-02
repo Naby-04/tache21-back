@@ -47,6 +47,7 @@ const controllerDownload = async (req, res) => {
       sign_url: false,
       flags: "attachment" //pour forcer postman a lancer direct le telechargement
     })
+    
     // Enregistre le téléchargement dans la base de données
     await Download.create({
       rapportId: rapport._id,

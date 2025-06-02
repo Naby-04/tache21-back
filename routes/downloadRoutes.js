@@ -8,7 +8,7 @@ const {controllerDownload, getDownloads, getDownloadsUser} = require("../control
 router.get("/:rapportId",protect, controllerDownload)
 
 // Recuperation des downloads
-router.get("/all/rapport", getDownloads)
+router.get("/all/rapport", admin, protect, getDownloads)
 router.get("/all/userRapport" ,protect, getDownloadsUser)
 
 
