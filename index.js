@@ -11,6 +11,7 @@ const usersRoutes = require("./routes/usersRoutes.js");
 const rapportRoutes = require("./routes/Rapport");
 const downloadRoutes = require("./routes/downloadRoutes");
 const commentRoutes = require("./routes/commentRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 
 // Swagger
 const swaggerUi = require("swagger-ui-express");
@@ -35,6 +36,8 @@ app.use("/api/users", usersRoutes);
 app.use("/rapport", rapportRoutes);
 app.use("/api/comments", commentRoutes)
 app.use("/download", downloadRoutes)
+app.use("/api/notifications", notificationRoutes);
+
 
 app.post("/test-upload", upload.single("file"), async (req, res) => {
   if (!req.file) {

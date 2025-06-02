@@ -9,12 +9,8 @@ const {protect} = require("../middlewares/authMiddleware")
 const { uploadToCloucinary } = require("../middlewares/upload");
 
 router.get("/:rapportId",protect, controllerDownload)
-
-// Recuperation des downloads
-router.get("/all/rapport", getDownloads)
-router.get("/all/userRapport" ,protect, getDownloadsUser)
-router.delete("/:id", protect, deleteDownload);
-
+router.get("/all/rapport", getDownloads);
+router.get("/all/userRapport", protect, getDownloadsUser);
 
 // Commentaires swagger
 /**
@@ -72,13 +68,11 @@ module.exports = router
 
 // // Mettez les routes spécifiques d'abord
 // router.get("/count/all", protect, admin, getDownloadCount);
-// router.get("/all/rapport", protect, admin, getDownloads);
-// router.get("/all/userRapport", protect, getDownloadsUser);
 
 // // Ensuite la route dynamique
 // router.get("/:rapportId", protect, controllerDownload);
 
 
 
-module.exports = 
-router
+// module.exports = 
+// router
