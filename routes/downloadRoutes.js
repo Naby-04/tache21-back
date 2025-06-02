@@ -2,14 +2,18 @@ const express = require("express");
 
 const router = express.Router()
 
-const {protect, admin} = require("../middlewares/authMiddleware")
-const {controllerDownload, getDownloads, getDownloadsUser} = require("../controllers/downloadController");
+// const {protect, admin} = require("../middlewares/authMiddleware")
+const {controllerDownload, getDownloads, getDownloadsUser , deleteDownload} = require("../controllers/downloadController");
+const {protect} = require("../middlewares/authMiddleware")
+// const {controllerDownload , getMyDownloads} = require("../controllers/downloadController");
+const { uploadToCloucinary } = require("../middlewares/upload");
 
 router.get("/:rapportId",protect, controllerDownload)
 
 // Recuperation des downloads
 router.get("/all/rapport", admin, protect, getDownloads)
 router.get("/all/userRapport" ,protect, getDownloadsUser)
+router.delete("/:id", protect, deleteDownload);
 
 
 // Commentaires swagger
@@ -61,3 +65,20 @@ router.get("/all/userRapport" ,protect, getDownloadsUser)
 */
 
 module.exports = router
+
+
+
+// const {controllerDownload, getDownloads, getDownloadsUser, getDownloadCount} = require("../controllers/downloadController");
+
+// // Mettez les routes spécifiques d'abord
+// router.get("/count/all", protect, admin, getDownloadCount);
+// router.get("/all/rapport", protect, admin, getDownloads);
+// router.get("/all/userRapport", protect, getDownloadsUser);
+
+// // Ensuite la route dynamique
+// router.get("/:rapportId", protect, controllerDownload);
+
+
+
+module.exports = 
+router

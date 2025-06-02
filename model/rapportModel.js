@@ -11,7 +11,7 @@ const rapportSchema = new mongoose.Schema({
     required: true,
   },
 
-  fileUrl: {
+  file: {
     type: String,
     required: true,
   },
@@ -32,20 +32,13 @@ const rapportSchema = new mongoose.Schema({
     type: String,
   },
 
-  user: {
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
 
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-
-});
+}, { timestamps: true });
 
 
-
-module.exports = mongoose.model("Rapport", rapportSchema);
-
+module.exports = mongoose.model("Rapport", rapportSchema)

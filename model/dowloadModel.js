@@ -8,10 +8,10 @@ const downloadSchema = new mongoose.Schema({
     required: true,
   },
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-  },
+     type: mongoose.Schema.Types.ObjectId,
+     ref: "User",
+     required: true,
+   },
   downloadAt: {
     type: Date,
     default: Date.now,

@@ -115,10 +115,16 @@ const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
+    console.log(user);
+    
 
     // Mise à jour uniquement du prénom et du mot de passe
     if (req.body.prenom) {
       user.prenom = req.body.prenom;
+    }
+
+    if (req.body.photo) {
+      user.photo = req.body.photo;
     }
 
     if (req.body.password) {
@@ -134,6 +140,7 @@ const getUserById = async (req, res) => {
         id: updatedUser._id,
         prenom: updatedUser.prenom,
         email: updatedUser.email, // affichage, mais non modifiable
+        photo: updatedUser.photo,
         isAdmin: updatedUser.isAdmin,
       },
       token,
@@ -172,11 +179,77 @@ const deleteUser = async (req, res) => {
       res.status(500).json({ message: "Erreur serveur" });
     }
   };
-  
 
+  // Contrôleur Google login
+const loginWithGoogle = async (req, res) => {
+  const { email, prenom } = req.body;
 
+  try {
+    const user = await User.findOne({ email });
 
- 
+    if (!user) {
+      return res.status(401).json({ message: "Email non reconnu. Veuillez vous inscrire." });
+    }
+
+    // Générer un token JWT
+    const token = user.generateToken();
+
+    res.json({
+      message: "Connexion via Google réussie",
+      user: {
+        id: user._id,
+        prenom: user.prenom,
+        email: user.email,
+        isAdmin: user.isAdmin,
+      },
+      token,
+    });
+  } catch (error) {
+    console.error("Erreur lors de la connexion Google :", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
+const registerWithGoogle = async (req, res) => {
+  try {
+    const { email, prenom } = req.body;
+
+    if (!email || !prenom) {
+      return res.status(400).json({ message: "Champs requis manquants" });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "Email déjà utilisé, veuillez vous connecter." });
+    }
+
+    // Crée un utilisateur avec un mot de passe aléatoire (ou vide si non nécessaire)
+    const randomPassword = Math.random().toString(36).slice(-8); // ex : 'x8d3t9zq'
+
+    const newUser = await User.create({
+      prenom,
+      email,
+      password: randomPassword,
+    });
+
+    const token = newUser.generateToken();
+
+    res.status(201).json({
+      message: "Inscription avec Google réussie",
+      user: {
+        id: newUser._id,
+        prenom: newUser.prenom,
+        email: newUser.email,
+        isAdmin: newUser.isAdmin,
+      },
+      token,
+    });
+  } catch (error) {
+    console.error("Erreur Google register:", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
 module.exports = {
      createUsers ,
      loginUser,
@@ -185,5 +258,7 @@ module.exports = {
      updateUserProfile,
      getAllUsers,
      deleteUser,
-     logout
+     logout,
+     loginWithGoogle,
+     registerWithGoogle
     }
