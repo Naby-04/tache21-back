@@ -65,7 +65,7 @@ const forgetPassword = async (req, res) => {
     user.resetPasswordExpires = expiration;
     await user.save();
 
-    const resetLink = `https://tache21-front-three.vercel.app/reinitialisermdp/${resetToken}`;
+    const resetLink = `https://senrapport-swart.vercel.app/reinitialisermdp/${resetToken}`;
 
     const { error } = await resend.emails.send({
       from: "SenRapport <hello@sunueducation.com>",
