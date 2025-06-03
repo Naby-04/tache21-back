@@ -75,7 +75,7 @@ app.use(errorHandler);
 
 // Démarrer le serveur
 connectDB().then(() => {
-  server.listen(process.env.PORT || 5000, () => {
+  server.listen(process.env.PORT || 8000, () => {
     console.log(`Server running on port ${process.env.PORT}`);
   });
 });
