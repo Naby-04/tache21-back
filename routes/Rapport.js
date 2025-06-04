@@ -8,7 +8,6 @@ const {
   getUserRapports,
   deleteUserRapport,
   updateUserRapport,
-  getRapportsByUserId,
 } = require("../controllers/rapportController");
 
 const { upload } = require("../middlewares/upload");
@@ -34,7 +33,7 @@ router.put(
 
 // Récupère tous les rapports d’un utilisateur spécifique via son ID
 
-router.get("/user/:userId", protect, getRapportsByUserId);
+
 
 /**
  * @swagger

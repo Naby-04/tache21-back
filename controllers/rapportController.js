@@ -1,18 +1,19 @@
 const mongoose = require("mongoose");
 const Rapport = require("../model/rapportModel");
-const streamifier = require("streamifier");
-const cloudinary = require("../cloudinary");
+const streamifier = require("streamifier")
+const cloudinary = require("../cloudinary")
+
+
+
 
 const createRapport = async (req, res) => {
   const { title, description, category, tags } = req.body;
   const file = req.file;
 
   console.log("req.body", req.body);
-
+  
   if (!title || !description || !file || !category) {
-    return res
-      .status(400)
-      .json({ message: "Veuillez renseigner tous les champs requis." });
+    return res.status(400).json({ message: "Veuillez renseigner tous les champs requis." });
   }
 
   try {
@@ -26,12 +27,7 @@ const createRapport = async (req, res) => {
           {
             folder: "uploads",
             public_id: `${Date.now()}_${file.originalname.split(".")[0].replace(/\s+/g, "_")}`,
-            resource_type:
-              mime.includes("pdf") ||
-              mime.includes("msword") ||
-              mime.includes("officedocument")
-                ? "raw"
-                : "auto",
+            resource_type: "raw",
           },
           (error, result) => {
             if (error) return reject(error);
@@ -59,27 +55,28 @@ const createRapport = async (req, res) => {
 
     await newRapport.save();
 
-    return res
-      .status(201)
-      .json({ message: "Rapport créé avec succès", rapport: newRapport });
+    // 🟢 Population de l'utilisateur AVANT de retourner le rapport
+    const rapportAvecUser = await Rapport.findById(newRapport._id).populate('userId', 'prenom photo');
+
+    return res.status(201).json({ message: "Rapport créé avec succès", rapport: rapportAvecUser });
   } catch (error) {
     console.error("Erreur dans /createRapport :", error);
-    return res.status(500).json({
-      message: "Une erreur s'est produite lors de la création du rapport.",
-    });
+    return res.status(500).json({ message: "Une erreur s'est produite lors de la création du rapport." });
   }
 };
 
+
+
+
 const getAllRapports = async (req, res) => {
   try {
+  
     const rapports = await Rapport.find({})
-      .sort({ createdAt: -1 })
-      .populate("userId", "prenom photo");
+  .sort({ createdAt: -1 })
+  .populate('userId', 'prenom photo'); 
     return res.status(200).json(rapports);
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Impossible de récupérer les rapports" });
+    return res.status(500).json({ message: "Impossible de récupérer les rapports" });
   }
 };
 
@@ -114,6 +111,7 @@ const deleteRapport = async (req, res) => {
 };
 
 const updateRapport = async (req, res) => {
+
   console.log("Données reçues dans req.body :", req.body);
   console.log("Fichier reçu dans req.file :", req.file);
 
@@ -122,47 +120,41 @@ const updateRapport = async (req, res) => {
   }
 
   const updateData = {
-    ...req.body,
-  };
-
-  if (req.file && req.file.path) {
-    updateData.fileUrl = req.file.path;
+    ...req.body
   }
 
+  if(req.file && req.file.path){
+    updateData.fileUrl = req.file.path
+  }
+
+
   try {
-    const updated = await Rapport.findByIdAndUpdate(req.params.id, updateData, {
-      new: true,
-      runValidators: true,
-    });
+    const updated = await Rapport.findByIdAndUpdate(req.params.id, updateData, { new: true, runValidators: true });
     if (!updated) {
       return res.status(404).json({ msg: "Rapport introuvable" });
     }
     return res.status(200).json({ msg: "Rapport modifié", rapport: updated });
   } catch (error) {
-    console.log(error);
+    console.log(error)
     return res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
 const getUserRapports = async (req, res) => {
   try {
-    const rapports = await Rapport.find({ user: req.user.id }).sort({
-      createdAt: -1,
-    });
+    const rapports = await Rapport.find({ userId: req.user.id }).sort({ createdAt: -1 });
+    // console.log("Rapports de l'utilisateur :", rapports);
+    
     return res.status(200).json(rapports);
   } catch (error) {
-    return res.status(500).json({
-      message: "Impossible de récupérer les rapports de l'utilisateur",
-    });
+    return res.status(500).json({ message: "Impossible de récupérer les rapports de l'utilisateur" });
   }
 };
 
 const deleteUserRapport = async (req, res) => {
   try {
-    const rapport = await Rapport.findOneAndDelete({
-      _id: req.params.id,
-      user: req.user.id,
-    });
+    const rapport = await Rapport.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
+    
     if (!rapport) {
       return res.status(404).json({ msg: "Rapport introuvable" });
     }
@@ -207,37 +199,14 @@ const updateUserRapport = async (req, res) => {
       return res.status(404).json({ msg: "Rapport introuvable" });
     }
 
-    return res
-      .status(200)
-      .json({ msg: "Rapport modifié avec succès", rapport });
+    return res.status(200).json({ msg: "Rapport modifié avec succès", rapport });
   } catch (error) {
+    console.error("Erreur lors de la mise à jour du rapport :", error);
     return res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
-const getRapportsByUserId = async (req, res) => {
-  const { userId } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
-    return res.status(400).json({ message: "ID utilisateur invalide" });
-  }
-
-  try {
-    const rapports = await Rapport.find({ user: userId }).sort({
-      createdAt: -1,
-    });
-    return res.status(200).json(rapports);
-  } catch (error) {
-    console.error(
-      "Erreur lors de la récupération des rapports par userId :",
-      error
-    );
-    return res.status(500).json({
-      message:
-        "Erreur serveur lors de la récupération des rapports de cet utilisateur",
-    });
-  }
-};
 
 module.exports = {
   createRapport,
@@ -248,5 +217,5 @@ module.exports = {
   getUserRapports,
   deleteUserRapport,
   updateUserRapport,
-  getRapportsByUserId,
 };
+
