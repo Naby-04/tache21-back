@@ -74,7 +74,7 @@ const getAllRapports = async (req, res) => {
   try {
     const rapports = await Rapport.find({})
       .sort({ createdAt: -1 })
-      .populate("userId", "prenom");
+      .populate("userId", "prenom" , "photo");
     return res.status(200).json(rapports);
   } catch (error) {
     return res
