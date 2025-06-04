@@ -110,7 +110,7 @@ const getUserById = async (req, res) => {
 };
 
   
-//UPDATE
+
  const updateUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -118,7 +118,7 @@ const getUserById = async (req, res) => {
     console.log(user);
     
 
-    // Mise à jour uniquement du prénom et du mot de passe
+
     if (req.body.prenom) {
       user.prenom = req.body.prenom;
     }

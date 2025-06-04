@@ -123,3 +123,106 @@ router.get("/top/commented", async (req, res) => {
 
 
 module.exports = router
+
+// COMMENTAIRES SWAGGER POUR LES ROUTES COMMENTAIRES
+
+/**
+ *  @swagger 
+*    paths:
+*   /api/comments/{rapportId}:
+*     post:
+*       summary: Ajouter un commentaire à un rapport
+*       tags:
+*         - Commentaires
+*       security:
+*         - bearerAuth: []
+*       parameters:
+*         - name: rapportId
+*           in: path
+*           required: true
+*           description: ID du rapport concerné
+*           schema:
+*             type: string
+*       requestBody:
+*         required: true
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               required:
+*                 - comment
+*               properties:
+*                 comment:
+*                   type: string
+*                   example: "Super rapport, très enrichissant !"
+*       responses:
+*         201:
+*           description: Commentaire ajouté avec succès
+*         400:
+*           description: Donnée manquante
+*         404:
+*           description: Rapport introuvable
+*         500:
+*           description: Erreur serveur
+
+*     get:
+*       summary: Obtenir tous les commentaires d’un rapport
+*       tags:
+*         - Commentaires
+*       parameters:
+*         - name: rapportId
+*           in: path
+*           required: true
+*           description: ID du rapport concerné
+*           schema:
+*             type: string
+*       responses:
+*         200:
+*           description: Liste des commentaires
+*         404:
+*           description: Rapport introuvable
+*         500:
+*           description: Erreur serveur
+
+*   /api/comments/{id}:
+*     delete:
+*       summary: Supprimer un commentaire (auteur ou admin)
+*       tags:
+*         - Commentaires
+*       security:
+*         - bearerAuth: []
+*       parameters:
+*         - name: id
+*           in: path
+*           required: true
+*           description: ID du commentaire à supprimer
+*           schema:
+*             type: string
+*       responses:
+*         200:
+*           description: Commentaire supprimé
+*         403:
+*           description: Non autorisé
+*         404:
+*           description: Commentaire introuvable
+*         500:
+*           description: Erreur serveur
+
+*   /api/comments/top/commented:
+*     get:
+*       summary: Obtenir les rapports les plus commentés (plus de 5 commentaires)
+*       tags:
+*         - Commentaires
+*       responses:
+*         200:
+*           description: Liste des rapports les plus commentés
+*         500:
+*           description: Erreur serveur
+
+* components:
+*   securitySchemes:
+*     bearerAuth:
+*       type: http
+*       scheme: bearer
+*       bearerFormat: JWT
+*/

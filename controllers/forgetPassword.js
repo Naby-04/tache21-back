@@ -43,6 +43,8 @@ const { Resend } = require("resend");
 const bcrypt = require("bcrypt");
 const { verificationHtml } = require('../utils/sendEmail');
 
+
+// API resend et importation du module
 const resend = new Resend("re_VAT37vpi_9PAbhEjGgE4Tvjy8jewTCyBr");
 
 const forgetPassword = async (req, res) => {

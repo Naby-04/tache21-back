@@ -4,7 +4,7 @@ const router = express.Router()
 
 // const {protect, admin} = require("../middlewares/authMiddleware")
 const {controllerDownload, getDownloads, getDownloadsUser , deleteDownload} = require("../controllers/downloadController");
-const {protect} = require("../middlewares/authMiddleware")
+const {protect, admin} = require("../middlewares/authMiddleware")
 // const {controllerDownload , getMyDownloads} = require("../controllers/downloadController");
 const { uploadToCloucinary } = require("../middlewares/upload");
 
