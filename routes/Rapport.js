@@ -1,29 +1,35 @@
-const express = require("express")
-const { createRapport,
+const express = require("express");
+const {
+  createRapport,
   getAllRapports,
   getRapportById,
   deleteRapport,
   updateRapport,
   getUserRapports,
   deleteUserRapport,
-  updateUserRapport,} = require("../controllers/rapportController")
+  updateUserRapport,
+  getRapportsByUserId,
+} = require("../controllers/rapportController");
 
-const {upload} = require("../middlewares/upload")
-const {protect} = require("../middlewares/authMiddleware")
+const { upload } = require("../middlewares/upload");
+const { protect } = require("../middlewares/authMiddleware");
 
-const router = express.Router()
+const router = express.Router();
 
-router.post("/create", protect, upload.single("fileUrl"), createRapport)
-router.get("/all", getAllRapports)
+router.post("/create", protect, upload.single("fileUrl"), createRapport);
+router.get("/all", getAllRapports);
 // router.post("/create", protect, upload.single("file"), createRapport)
-router.get("/all", protect, getAllRapports)
-router.delete("/:id", protect, deleteRapport)
-router.put("/:id", protect, updateRapport)
-router.get("/one/:id", protect, getRapportById)
+router.get("/all", protect, getAllRapports);
+router.delete("/:id", protect, deleteRapport);
+router.put("/:id", protect, updateRapport);
+router.get("/one/:id", protect, getRapportById);
 
-router.get("/getMyRapport",protect, getUserRapports)
-router.delete("/deleteMyRapport",protect, deleteUserRapport)
-router.post("/updateMyRapport",protect, updateUserRapport)
+router.get("/getMyRapport", protect, getUserRapports);
+router.delete("/deleteMyRapport", protect, deleteUserRapport);
+router.post("/updateMyRapport", protect, updateUserRapport);
+// Récupère tous les rapports d’un utilisateur spécifique via son ID
+
+router.get("/user/:userId", protect, getRapportsByUserId);
 
 /**
  * @swagger
@@ -161,9 +167,6 @@ router.post("/updateMyRapport",protect, updateUserRapport)
  *         description: Rapport non trouvé
  */
 
-
-
-
-module.exports = router
+module.exports = router;
 
 //le upload.single("fichier") permet de recuperer le fichier , LE STOCK DANS uploads avec un nom unique et ajoute un obbet req.file. Ainsi la createRapport pour stocker le req.file.path dans le fileUrl
