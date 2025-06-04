@@ -1,5 +1,5 @@
-const User = require("../model/userModel");
-const Rapport = require("../model/rapportModel");
+const User = require('../model/userModel')
+const Rapport = require('../model/rapportModel')
 
 const createUsers = async (req, res) => {
   try {
@@ -172,37 +172,49 @@ const updateUserProfile = async (req, res) => {
 
 //GET All users
 const getAllUsers = async (req, res) => {
-  try {
-    const users = await User.find().select("-password"); // sans les mots de passe
-    res.status(200).json(users);
-  } catch (error) {
-    console.error("Erreur récupération des utilisateurs :", error);
-    res.status(500).json({ message: "Erreur serveur" });
-  }
-};
-
-//DELETE
+    try {
+      const users = await User.find().select("-password"); // sans les mots de passe
+      res.status(200).json(users);
+    } catch (error) {
+      console.error("Erreur récupération des utilisateurs :", error);
+      res.status(500).json({ message: "Erreur serveur" });
+    }
+  };
+  
+//DELETE   
 const deleteUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    if (!user)
-      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
 
-    // 🗑️ Supprimer tous les rapports liés à cet utilisateur
+    // 🗑 Supprimer tous les rapports liés à cet utilisateur
     await Rapport.deleteMany({ userId: user._id });
 
     // ✅ Supprimer ensuite l'utilisateur
     await user.deleteOne();
 
-    res
-      .status(200)
-      .json({ message: "Utilisateur et ses rapports supprimés avec succès" });
+    res.status(200).json({ message: "Utilisateur et ses rapports supprimés avec succès" });
   } catch (error) {
     console.error("Erreur suppression utilisateur :", error);
-    res.status(500).json({ message: "Erreur serveur" });
-  }
+    res.status(500).json({ message: "Erreur serveur" });
+  }
 };
-// Contrôleur Google login
+
+//DELETE   
+// const deleteUser = async (req, res) => {
+//     try {
+//       const user = await User.findById(req.params.id);
+//       if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
+  
+//       await user.deleteOne();
+//       res.status(200).json({ message: "Utilisateur supprimé avec succès" });
+//     } catch (error) {
+//       console.error("Erreur suppression utilisateur :", error);
+//       res.status(500).json({ message: "Erreur serveur" });
+//     }
+//   };
+
+  // Contrôleur Google login
 const loginWithGoogle = async (req, res) => {
   const { email, prenom } = req.body;
 
