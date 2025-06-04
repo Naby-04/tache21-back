@@ -12,21 +12,26 @@ const {
 } = require("../controllers/rapportController");
 
 const { upload } = require("../middlewares/upload");
-const { protect } = require("../middlewares/authMiddleware");
+const { protect, admin } = require("../middlewares/authMiddleware");
+// const { getDownloads, getDownloadsUser } = require("../controllers/downloadController")
 
 const router = express.Router();
 
-router.post("/create", protect, upload.single("fileUrl"), createRapport);
 router.get("/all", getAllRapports);
-// router.post("/create", protect, upload.single("file"), createRapport)
-router.get("/all", protect, getAllRapports);
+router.post("/create", protect, upload.single("file"), createRapport);
 router.delete("/:id", protect, deleteRapport);
 router.put("/:id", protect, updateRapport);
 router.get("/one/:id", protect, getRapportById);
 
 router.get("/getMyRapport", protect, getUserRapports);
-router.delete("/deleteMyRapport", protect, deleteUserRapport);
-router.post("/updateMyRapport", protect, updateUserRapport);
+router.delete("/deleteMyRapport/:id", protect, deleteUserRapport);
+router.put(
+  "/updateMyRapport/:id",
+  protect,
+  upload.single("file"),
+  updateUserRapport
+);
+
 // Récupère tous les rapports d’un utilisateur spécifique via son ID
 
 router.get("/user/:userId", protect, getRapportsByUserId);

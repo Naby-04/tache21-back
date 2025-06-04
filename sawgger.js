@@ -10,12 +10,66 @@ const options = {
     },
     servers: [
       {
-        // url: "http://localhost:8080"
+        // url: "http://localhost:8000",
         url: "https://tache21-back.onrender.com"
       },
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+      schemas: {
+        User: {
+          type: "object",
+          required: ["prenom", "email", "password"],
+          properties: {
+            prenom: {
+              type: "string",
+              example: "Ndeye Amie",
+            },
+            email: {
+              type: "string",
+              format: "email",
+              example: "ndeyeamie@gmail.com",
+            },
+            password: {
+              type: "string",
+              format: "password",
+              example: "passer123",
+            },
+            isAdmin: {
+              type: "boolean",
+              default: false,
+            },
+            photo: {
+              type: "string",
+              format: "uri",
+              example: "https://example.com/photo.jpg",
+            },
+            resetPasswordToken: {
+              type: "string",
+              nullable: true,
+            },
+            resetPasswordExpires: {
+              type: "string",
+              format: "date-time",
+              nullable: true,
+            },
+          },
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
   },
-  apis: ["./routes/*.js"], // ou "./controllers/*.js" selon où tu écris les commentaires
+  apis: ["./routes/*.js"], 
 };
 
 const swaggerSpec = swaggerJSDoc(options);

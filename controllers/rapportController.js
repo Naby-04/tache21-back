@@ -7,6 +7,8 @@ const createRapport = async (req, res) => {
   const { title, description, category, tags } = req.body;
   const file = req.file;
 
+  console.log("req.body", req.body);
+
   if (!title || !description || !file || !category) {
     return res
       .status(400)
@@ -14,9 +16,9 @@ const createRapport = async (req, res) => {
   }
 
   try {
-    // On récupère le type MIME du fichier
-    const mime = file.mimetype;
-
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
     // Fonction pour envoyer le fichier à Cloudinary
     const streamUpload = (fileBuffer) => {
       return new Promise((resolve, reject) => {
@@ -47,12 +49,12 @@ const createRapport = async (req, res) => {
     const newRapport = new Rapport({
       title,
       description,
-      fileUrl: result.secure_url,
+      file: result.secure_url,
       category,
       tags,
       type: file.mimetype,
-      date: new Date().toLocaleString(),
-      user: req.user.id,
+      date: new Date(),
+      userId: req.user.id,
     });
 
     await newRapport.save();
@@ -70,7 +72,6 @@ const createRapport = async (req, res) => {
 
 const getAllRapports = async (req, res) => {
   try {
-    // const rapports = await Rapport.find({}).sort({ createdAt: -1 });
     const rapports = await Rapport.find({})
       .sort({ createdAt: -1 })
       .populate("userId", "prenom");
@@ -176,10 +177,29 @@ const updateUserRapport = async (req, res) => {
     return res.status(400).json({ message: "ID invalide" });
   }
 
+  if (!req.user || !req.user.id) {
+    return res.status(401).json({ message: "Non autorisé" });
+  }
+
+  const { title, description } = req.body;
+
+  if (!title || !description) {
+    return res.status(400).json({ message: "Champs requis manquants" });
+  }
+
+  const updateData = {
+    title,
+    description,
+  };
+
+  if (req.file) {
+    updateData.fileUrl = `/uploads/${req.file.filename}`;
+  }
+
   try {
     const rapport = await Rapport.findOneAndUpdate(
-      { _id: req.params.id, user: req.user.id },
-      req.body,
+      { _id: req.params.id, userId: req.user.id },
+      updateData,
       { new: true }
     );
 
