@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const cloudinary = require("../cloudinary");
 
 const Download = require("../model/dowloadModel");
 const Rapport = require("../model/rapportModel");

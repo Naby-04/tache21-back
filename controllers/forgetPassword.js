@@ -67,7 +67,7 @@ const forgetPassword = async (req, res) => {
     user.resetPasswordExpires = expiration;
     await user.save();
 
-    const resetLink = `http://localhost:5173/reinitialisermdp/${resetToken}`;
+    const resetLink = `https://senrapport.netlify.app/#/reinitialisermdp/${resetToken}`;
 
     const { error } = await resend.emails.send({
       from: "SenRapport <hello@sunueducation.com>",

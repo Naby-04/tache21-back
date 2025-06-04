@@ -1,9 +1,14 @@
 const User = require('../model/userModel')
+const Rapport = require("../model/rapportModel");
 
 const createUsers = async (req, res) => {
     try {
         const { prenom, email, password , isAdmin} = req.body;
+ if (!prenom || !email || !password) {
+      return res.status(400).json({ message: "Tous les champs sont obligatoires" });
+    }
 
+   
         // vérifier si l'utilisateur existe
         const userExist = await User.findOne({ email });
         if (userExist) return res.status(400).json({ message: "Email deja utilisé" });
@@ -50,6 +55,10 @@ const loginUser = async (req, res) => {
    
       // Chercher l'utilisateur
       const user = await User.findOne({ email });
+       if (!user) {
+      // Email non trouvé
+      return res.status(404).json({ message: "Cet email n'existe pas. Veuillez vous inscrire." });
+    }
       if (!user) return res.status(400).json({ message: "Email ou mot de passe incorrect" });
   
       // Vérifier le mot de passe
@@ -168,18 +177,22 @@ const getAllUsers = async (req, res) => {
 
 //DELETE   
 const deleteUser = async (req, res) => {
-    try {
-      const user = await User.findById(req.params.id);
-      if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
-  
-      await user.deleteOne();
-      res.status(200).json({ message: "Utilisateur supprimé avec succès" });
-    } catch (error) {
-      console.error("Erreur suppression utilisateur :", error);
-      res.status(500).json({ message: "Erreur serveur" });
-    }
-  };
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
 
+    // 🗑️ Supprimer tous les rapports liés à cet utilisateur
+    await Rapport.deleteMany({ userId: user._id });
+
+    // ✅ Supprimer ensuite l'utilisateur
+    await user.deleteOne();
+
+    res.status(200).json({ message: "Utilisateur et ses rapports supprimés avec succès" });
+  } catch (error) {
+    console.error("Erreur suppression utilisateur :", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
   // Contrôleur Google login
 const loginWithGoogle = async (req, res) => {
   const { email, prenom } = req.body;

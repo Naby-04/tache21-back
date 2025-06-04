@@ -4,8 +4,6 @@ const streamifier = require("streamifier")
 const cloudinary = require("../cloudinary")
 
 
-
-
 const createRapport = async (req, res) => {
   const { title, description, category, tags } = req.body;
   const file = req.file;
@@ -24,16 +22,28 @@ const createRapport = async (req, res) => {
     const streamUpload = (fileBuffer) => {
       return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
-          {
-            folder: "uploads",
-            public_id: `${Date.now()}_${file.originalname.split(".")[0].replace(/\s+/g, "_")}`,
-            resource_type: "raw",
-          },
-          (error, result) => {
-            if (error) return reject(error);
-            resolve(result);
-          }
-        );
+            {
+              folder: "uploads",
+              public_id: `${Date.now()}_${file.originalname.split(".")[0].replace(/\s+/g, "_")}`,
+              resource_type: "raw",
+              type: "upload" // ✅ Ceci rend le fichier public
+            },
+            (error, result) => {
+              if (error) return reject(error);
+              resolve(result);
+            }
+          );
+        // const stream = cloudinary.uploader.upload_stream(
+        //   {
+        //     folder: "uploads",
+        //     public_id: `${Date.now()}_${file.originalname.split(".")[0].replace(/\s+/g, "_")}`,
+        //     resource_type: mime.includes("pdf") || mime.includes("msword") || mime.includes("officedocument") ? "raw" : "auto",
+        //   },
+        //   (error, result) => {
+        //     if (error) return reject(error);
+        //     resolve(result);
+        //   }
+        // );
         streamifier.createReadStream(fileBuffer).pipe(stream);
       });
     };
@@ -203,12 +213,9 @@ const updateUserRapport = async (req, res) => {
 
     return res.status(200).json({ msg: "Rapport modifié avec succès", rapport });
   } catch (error) {
-    console.error("Erreur lors de la mise à jour du rapport :", error);
     return res.status(500).json({ message: "Erreur serveur" });
   }
 };
-
-
 
 module.exports = {
   createRapport,
