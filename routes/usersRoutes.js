@@ -15,13 +15,11 @@ const {createUsers,
 const { forgetPassword , resetPassword} = require("../controllers/forgetPassword");
 
 router.post("/register", createUsers);
-
 router.post("/login", loginUser);
 
 router.get("/profile",protect, getUserProfile);
 
 router.get("/admin/user/:id", protect, admin, getUserById);
-
 router.put("/update", protect, updateUserProfile); 
 
 router.get("/allusers", protect ,  getAllUsers);
@@ -353,4 +351,4 @@ router.post("/google-register", registerWithGoogle);
 
 
 
-module.exports = router
+module.exports = router;

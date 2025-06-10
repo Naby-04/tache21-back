@@ -1,28 +1,37 @@
-const express = require("express")
-const { createRapport,
+const express = require("express");
+const {
+  createRapport,
   getAllRapports,
   getRapportById,
   deleteRapport,
   updateRapport,
   getUserRapports,
   deleteUserRapport,
-  updateUserRapport,} = require("../controllers/rapportController")
+  updateUserRapport,
+} = require("../controllers/rapportController");
 
-const {upload} = require("../middlewares/upload")
-const {protect, admin} = require("../middlewares/authMiddleware")
+const { upload } = require("../middlewares/upload");
+const { protect, admin } = require("../middlewares/authMiddleware");
 // const { getDownloads, getDownloadsUser } = require("../controllers/downloadController")
 
-const router = express.Router()
+const router = express.Router();
 
-router.get("/all", getAllRapports)
-router.post("/create", protect, upload.single("file"), createRapport)
-router.delete("/:id", protect, deleteRapport)
-router.put("/:id", protect, updateRapport)
-router.get("/one/:id", protect, getRapportById)
+router.get("/all", getAllRapports);
+router.post("/create", protect, upload.single("file"), createRapport);
+router.delete("/:id", protect, deleteRapport);
+router.put("/:id", protect, updateRapport);
+router.get("/one/:id", protect, getRapportById);
 
-router.get("/getMyRapport",protect, getUserRapports)
-router.delete("/deleteMyRapport/:id",protect, deleteUserRapport)
-router.put("/updateMyRapport/:id", protect, upload.single("file"), updateUserRapport);
+router.get("/getMyRapport", protect, getUserRapports);
+router.delete("/deleteMyRapport/:id", protect, deleteUserRapport);
+router.put(
+  "/updateMyRapport/:id",
+  protect,
+  upload.single("file"),
+  updateUserRapport
+);
+
+// Récupère tous les rapports d’un utilisateur spécifique via son ID
 
 
 
@@ -162,9 +171,6 @@ router.put("/updateMyRapport/:id", protect, upload.single("file"), updateUserRap
  *         description: Rapport non trouvé
  */
 
-
-
-
-module.exports = router
+module.exports = router;
 
 //le upload.single("fichier") permet de recuperer le fichier , LE STOCK DANS uploads avec un nom unique et ajoute un obbet req.file. Ainsi la createRapport pour stocker le req.file.path dans le fileUrl
